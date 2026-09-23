@@ -23,7 +23,7 @@ interface PriorityCase {
 }
 
 export const DoctorDashboardScreen: React.FC = () => {
-  const { doctorProfile, account, screenings, navigate, signOut, language } = useApp();
+  const { doctorProfile, account, screenings, navigate, signOut, language, viewReport } = useApp();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
@@ -138,13 +138,21 @@ export const DoctorDashboardScreen: React.FC = () => {
           </View>
         ) : (
           <View style={styles.casesList}>
-          {highPriorityCases.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.caseCard}
-              activeOpacity={0.8}
-              onPress={() => navigate('doctorQueue')}
-            >
+          {highPriorityCases.map((item) => {
+            const rawScreening = screenings.find((s) => s.id === item.id);
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.caseCard}
+                activeOpacity={0.8}
+                onPress={() => {
+                  if (rawScreening) {
+                    viewReport(rawScreening);
+                  } else {
+                    navigate('doctorQueue');
+                  }
+                }}
+              >
               {/* Initials */}
               <View
                 style={[
@@ -198,7 +206,8 @@ export const DoctorDashboardScreen: React.FC = () => {
                 </View>
               </View>
             </TouchableOpacity>
-          ))}
+            );
+          })}
         </View>
         )}
 

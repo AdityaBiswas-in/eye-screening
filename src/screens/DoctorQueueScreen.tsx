@@ -10,43 +10,32 @@ import {
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 
-interface QueueItem {
-  id: string;
-  initials: string;
-  name: string;
-  age: number;
-  time: string;
-  condition: string;
-  status: 'REFERABLE' | 'UNCERTAIN' | 'NON-REF.';
-  confidence: number;
-  quality: 'Excellent' | 'Good' | 'Acceptable';
-}
+
 
 export const DoctorQueueScreen: React.FC = () => {
-  const { navigate, goBack, screenings } = useApp();
+  const { navigate, goBack, screenings, viewReport } = useApp();
 
-  const queue: QueueItem[] = screenings.map((s) => ({
-    id: s.id,
-    initials: s.initials,
-    name: s.name,
-    age: typeof s.age === 'number' ? s.age : parseInt(s.age as string, 10) || 50,
-    time: s.date || 'Today',
-    condition: s.condition,
-    status: (s.status === 'REFERABLE' ? 'REFERABLE' : 'NON-REF.') as
-      | 'REFERABLE'
-      | 'UNCERTAIN'
-      | 'NON-REF.',
-    confidence: 94,
-    quality: 'Good' as const,
-  }));
+  const handleOpenReport = (screeningItem: (typeof screenings)[0]) => {
+    viewReport(screeningItem);
+  };
 
-  const handleReviewCase = (item: QueueItem) => {
+  const handleReviewCase = (item: (typeof screenings)[0]) => {
     Alert.alert(
       `Review: ${item.name}`,
-      `Diagnosis: ${item.condition}\nStatus: ${item.status}\nAI Confidence: ${item.confidence}%\nImage Quality: ${item.quality}\n\nActions:`,
+      `Diagnosis: ${item.condition}\nStatus: ${item.status}\nAI Confidence: ${item.aiConfidence || 94}%\nImage Quality: ${item.imageQuality || 'Good'}\nCaptured by field worker with high-res fundus camera.`,
       [
-        { text: 'Confirm AI Result', onPress: () => Alert.alert('Verified', 'Case confirmed and saved.') },
-        { text: 'Refer to Specialist', onPress: () => Alert.alert('Referred', 'Referral request generated.') },
+        {
+          text: '📄 Open Full Screening Report',
+          onPress: () => handleOpenReport(item),
+        },
+        {
+          text: 'Confirm AI Result',
+          onPress: () => Alert.alert('Verified', 'Case confirmed and saved.'),
+        },
+        {
+          text: 'Refer to Specialist',
+          onPress: () => Alert.alert('Referred', 'Referral request generated.'),
+        },
         { text: 'Close', style: 'cancel' },
       ]
     );
@@ -71,87 +60,103 @@ export const DoctorQueueScreen: React.FC = () => {
         </View>
 
         {/* List of Cases or Clean Empty State */}
-        {queue.length === 0 ? (
+        {screenings.length === 0 ? (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyEmoji}>📋</Text>
             <Text style={styles.emptyTitle}>Queue is empty</Text>
             <Text style={styles.emptySubtitle}>
-              No screenings currently awaiting doctor review. New screenings submitted by health workers will appear here.
+              No screenings currently awaiting doctor review. New screenings submitted by healthcare field workers will appear here.
             </Text>
           </View>
         ) : (
           <View style={styles.queueList}>
-            {queue.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.queueCard}
-              activeOpacity={0.8}
-              onPress={() => handleReviewCase(item)}
-            >
-              <View style={styles.cardMainRow}>
-                {/* Initials Avatar */}
-                <View
-                  style={[
-                    styles.initialsBox,
-                    item.status === 'REFERABLE' && styles.initialsRed,
-                    item.status === 'UNCERTAIN' && styles.initialsAmber,
-                    item.status === 'NON-REF.' && styles.initialsMint,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.initialsText,
-                      item.status === 'REFERABLE' && styles.textRed,
-                      item.status === 'UNCERTAIN' && styles.textAmber,
-                      item.status === 'NON-REF.' && styles.textMint,
-                    ]}
-                  >
-                    {item.initials}
-                  </Text>
-                </View>
-
-                {/* Patient Info */}
-                <View style={styles.patientInfo}>
-                  <Text style={styles.patientName}>{item.name}</Text>
-                  <Text style={styles.patientMeta}>
-                    Age {item.age} · {item.time}
-                  </Text>
-                </View>
-
-                {/* Condition & Status Badge */}
-                <View style={styles.statusCol}>
-                  <Text style={styles.conditionText}>{item.condition}</Text>
+            {screenings.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.queueCard}
+                activeOpacity={0.85}
+                onPress={() => handleOpenReport(item)}
+              >
+                <View style={styles.cardMainRow}>
+                  {/* Initials Avatar */}
                   <View
                     style={[
-                      styles.statusBadge,
-                      item.status === 'REFERABLE' && styles.badgeRed,
-                      item.status === 'UNCERTAIN' && styles.badgeAmber,
-                      item.status === 'NON-REF.' && styles.badgeGreen,
+                      styles.initialsBox,
+                      item.status === 'REFERABLE' ? styles.initialsRed : styles.initialsMint,
                     ]}
                   >
                     <Text
                       style={[
-                        styles.statusBadgeText,
-                        item.status === 'REFERABLE' && styles.badgeTextRed,
-                        item.status === 'UNCERTAIN' && styles.badgeTextAmber,
-                        item.status === 'NON-REF.' && styles.badgeTextGreen,
+                        styles.initialsText,
+                        item.status === 'REFERABLE' ? styles.textRed : styles.textMint,
                       ]}
                     >
-                      {item.status}
+                      {item.initials || 'PT'}
                     </Text>
                   </View>
-                </View>
-              </View>
 
-              {/* Sub-row with AI Confidence & Quality */}
-              <View style={styles.metaRow}>
-                <Text style={styles.metaRowText}>
-                  Confidence: {item.confidence}% · Quality: {item.quality}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+                  {/* Patient Info */}
+                  <View style={styles.patientInfo}>
+                    <Text style={styles.patientName}>{item.name}</Text>
+                    <Text style={styles.patientMeta}>
+                      Age {item.age} · {item.date || 'Today'}
+                    </Text>
+                  </View>
+
+                  {/* Condition & Status Badge */}
+                  <View style={styles.statusCol}>
+                    <Text style={styles.conditionText}>{item.condition}</Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        item.status === 'REFERABLE' ? styles.badgeRed : styles.badgeGreen,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.statusBadgeText,
+                          item.status === 'REFERABLE' ? styles.badgeTextRed : styles.badgeTextGreen,
+                        ]}
+                      >
+                        {item.status === 'REFERABLE' ? 'REFERABLE' : 'NON-REF.'}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Sub-row with AI Confidence, Quality & Worker Tag */}
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaRowText}>
+                    AI Confidence: {item.aiConfidence || 94}% · Quality: {item.imageQuality || 'Good'}
+                  </Text>
+                  <Text style={styles.capturedBadgeText}>
+                    📸 Captured by Field Worker
+                  </Text>
+                </View>
+
+                {/* Direct Action Buttons for Doctor */}
+                <View style={styles.cardActionRow}>
+                  <TouchableOpacity
+                    style={styles.viewReportActionBtn}
+                    activeOpacity={0.8}
+                    onPress={() => handleOpenReport(item)}
+                  >
+                    <Text style={styles.viewReportActionBtnText}>
+                      🔍 View Full Screening Report
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.quickReviewBtn}
+                    activeOpacity={0.8}
+                    onPress={() => handleReviewCase(item)}
+                  >
+                    <Text style={styles.quickReviewBtnText}>⚡ Quick Actions</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         )}
       </ScrollView>
 
@@ -330,12 +335,67 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#f8fafc',
+    borderTopColor: '#f1f5f9',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
   },
   metaRowText: {
     fontSize: 11.5,
     color: colors.textMuted,
+    fontWeight: '500',
+  },
+  capturedBadgeText: {
+    fontSize: 11,
+    color: '#0284c7',
+    fontWeight: '700',
+    backgroundColor: '#f0f9ff',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  cardActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  viewReportActionBtn: {
+    flex: 1.4,
+    backgroundColor: colors.primary,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  viewReportActionBtnText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  quickReviewBtn: {
+    flex: 1,
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  quickReviewBtnText: {
+    color: colors.textPrimary,
+    fontSize: 11.5,
+    fontWeight: '600',
   },
   bottomNav: {
     position: 'absolute',
