@@ -13,7 +13,7 @@ import { colors } from '../theme/colors';
 
 
 export const DoctorQueueScreen: React.FC = () => {
-  const { navigate, goBack, screenings, viewReport } = useApp();
+  const { goBack, screenings, viewReport } = useApp();
 
   const handleOpenReport = (screeningItem: (typeof screenings)[0]) => {
     viewReport(screeningItem);
@@ -128,32 +128,37 @@ export const DoctorQueueScreen: React.FC = () => {
 
                 {/* Sub-row with AI Confidence, Quality & Worker Tag */}
                 <View style={styles.metaRow}>
-                  <Text style={styles.metaRowText}>
-                    AI Confidence: {item.aiConfidence || 94}% · Quality: {item.imageQuality || 'Good'}
-                  </Text>
-                  <Text style={styles.capturedBadgeText}>
-                    📸 Captured by Field Worker
-                  </Text>
+                  <View style={styles.aiPill}>
+                    <Text style={styles.aiPillDot}>●</Text>
+                    <Text style={styles.aiPillText}>
+                      AI {item.aiConfidence || 94}% · {item.imageQuality || 'Good'}
+                    </Text>
+                  </View>
+                  <View style={styles.capturedBadge}>
+                    <Text style={styles.capturedBadgeText}>
+                      📸 Field Worker Capture
+                    </Text>
+                  </View>
                 </View>
 
                 {/* Direct Action Buttons for Doctor */}
                 <View style={styles.cardActionRow}>
                   <TouchableOpacity
                     style={styles.viewReportActionBtn}
-                    activeOpacity={0.75}
+                    activeOpacity={0.8}
                     onPress={() => handleOpenReport(item)}
                   >
                     <Text style={styles.viewReportActionBtnText}>
-                      🔍 View Full Screening Report
+                      📄 View Full Report
                     </Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
                     style={styles.quickReviewBtn}
-                    activeOpacity={0.75}
+                    activeOpacity={0.8}
                     onPress={() => handleReviewCase(item)}
                   >
-                    <Text style={styles.quickReviewBtnText}>⚡ Quick Actions</Text>
+                    <Text style={styles.quickReviewBtnText}>⚡ Quick Review</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -161,30 +166,6 @@ export const DoctorQueueScreen: React.FC = () => {
           </View>
         )}
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigate('doctorDashboard')}
-        >
-          <Text style={styles.navIcon}>🏠</Text>
-          <Text style={styles.navLabel}>Dashboard</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={[styles.navIcon, styles.navActive]}>📋</Text>
-          <Text style={[styles.navLabel, styles.navLabelActive]}>Queue</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => Alert.alert('Clinical Evidence', 'AI feature maps & Grad-CAM visual evidence.')}
-        >
-          <Text style={styles.navIcon}>🔍</Text>
-          <Text style={styles.navLabel}>Evidence</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -197,7 +178,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 22,
     paddingTop: 52,
-    paddingBottom: 90,
+    paddingBottom: 36,
   },
   topHeader: {
     flexDirection: 'row',
@@ -334,111 +315,92 @@ const styles = StyleSheet.create({
     color: '#10b981',
   },
   metaRow: {
-    marginTop: 8,
-    paddingTop: 8,
+    marginTop: 10,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: '#f1f5f9',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 8,
   },
-  metaRowText: {
-    fontSize: 11.5,
-    color: colors.textMuted,
-    fontWeight: '500',
+  aiPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f1f5f9',
+    paddingHorizontal: 8,
+    paddingVertical: 3.5,
+    borderRadius: 8,
+    gap: 5,
+  },
+  aiPillDot: {
+    fontSize: 8,
+    color: '#0ea5e9',
+  },
+  aiPillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#334155',
+  },
+  capturedBadge: {
+    backgroundColor: '#eff6ff',
+    paddingHorizontal: 8,
+    paddingVertical: 3.5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#dbeafe',
   },
   capturedBadgeText: {
-    fontSize: 11,
-    color: '#0284c7',
+    fontSize: 10.5,
+    color: '#1d4ed8',
     fontWeight: '700',
-    backgroundColor: '#f0f9ff',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
   },
   cardActionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
-    gap: 8,
+    gap: 9,
   },
   viewReportActionBtn: {
     flex: 1.4,
+    height: 40,
     backgroundColor: colors.primary,
-    paddingVertical: 9,
     paddingHorizontal: 12,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.22,
+    shadowRadius: 5,
+    elevation: 3,
   },
   viewReportActionBtnText: {
     color: '#ffffff',
-    fontSize: 12,
+    fontSize: 12.5,
     fontWeight: '700',
+    letterSpacing: 0.1,
   },
   quickReviewBtn: {
     flex: 1,
-    backgroundColor: '#f1f5f9',
-    paddingVertical: 9,
+    height: 40,
+    backgroundColor: '#ffffff',
     paddingHorizontal: 10,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderWidth: 1.2,
+    borderColor: '#cbd5e1',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 2,
+    elevation: 1,
   },
   quickReviewBtnText: {
     color: colors.textPrimary,
-    fontSize: 11.5,
-    fontWeight: '600',
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 74,
-    backgroundColor: '#ffffff',
-    borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
-    paddingBottom: 6,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  navIcon: {
-    fontSize: 20,
-    marginBottom: 2,
-    opacity: 0.5,
-  },
-  navActive: {
-    opacity: 1,
-  },
-  navLabel: {
-    fontSize: 11,
-    color: colors.textLight,
-    fontWeight: '600',
-  },
-  navLabelActive: {
-    color: colors.primary,
+    fontSize: 12,
     fontWeight: '700',
   },
   emptyCard: {
