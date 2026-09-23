@@ -214,6 +214,24 @@ export const PatientProfileScreen: React.FC = () => {
                 })}
               </View>
             </View>
+
+            {/* Patient ID Display Card */}
+            <View style={styles.patientIdCard}>
+              <View style={styles.patientIdRow}>
+                <View style={styles.patientIdIconBox}>
+                  <Ionicons name="finger-print" size={18} color={colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.patientIdLabel}>YOUR PATIENT ID</Text>
+                  <Text style={styles.patientIdValue}>
+                    {patientProfile.patientId || 'Generated after saving'}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.patientIdHint}>
+                Share this ID with your field worker so they can link your screening results to your profile.
+              </Text>
+            </View>
           </View>
         </ScrollView>
 
@@ -397,5 +415,46 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
+  },
+  patientIdCard: {
+    backgroundColor: colors.primaryMuted,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    padding: 16,
+    gap: 10,
+  },
+  patientIdRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  patientIdIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#c7e3e5',
+  },
+  patientIdLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    color: colors.primary,
+    marginBottom: 3,
+  },
+  patientIdValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.textPrimary,
+    letterSpacing: 1,
+  },
+  patientIdHint: {
+    fontSize: 12,
+    color: colors.textMuted,
+    lineHeight: 17,
   },
 });

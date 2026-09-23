@@ -11,6 +11,16 @@ import {
 } from '../types';
 import { translations, Translations } from '../i18n/translations';
 
+// Helper to generate a short unique patient ID like PAT-A1B2C3
+const generatePatientId = (): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = 'PAT-';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 interface AppContextType {
   currentScreen: ScreenType;
   language: SupportedLanguage;
@@ -56,6 +66,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     age: '',
     sex: null,
     hasDiabetes: null,
+    patientId: '',
   });
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile>({
     fullName: '',
@@ -100,7 +111,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updatePatientProfile = (updates: Partial<PatientProfile>) => {
-    setPatientProfile((prev) => ({ ...prev, ...updates }));
+    setPatientProfile((prev) => {
+      // Auto-generate a patientId the first time if not already set
+      const patientId = prev.patientId || generatePatientId();
+      return { ...prev, ...updates, patientId };
+    });
   };
 
   const updateWorkerProfile = (updates: Partial<WorkerProfile>) => {
@@ -122,7 +137,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = () => {
     setAccount({ fullName: '', phoneNumber: '', countryCode: '+91' });
-    setPatientProfile({ fullName: '', phoneNumber: '', age: '', sex: null, hasDiabetes: null });
+    setPatientProfile({ fullName: '', phoneNumber: '', age: '', sex: null, hasDiabetes: null, patientId: '' });
     setWorkerProfile({ fullName: '', phoneNumber: '', healthcareCentre: '', organisation: '' });
     setDoctorProfile({
       fullName: '',

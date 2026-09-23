@@ -16,7 +16,6 @@ import { LANGUAGES } from '../i18n/translations';
 
 export const DashboardScreen: React.FC = () => {
   const {
-    t,
     account,
     patientProfile,
     language,
@@ -83,32 +82,18 @@ export const DashboardScreen: React.FC = () => {
 
           <View style={styles.divider} />
 
-          {/* Patient Details Snapshot */}
-          <View style={styles.infoGrid}>
-            <View style={styles.infoCol}>
-              <Text style={styles.infoLabel}>{t.age}</Text>
-              <Text style={styles.infoValue}>{patientProfile.age ? `${patientProfile.age} yrs` : '—'}</Text>
+          {/* Patient ID Card */}
+          <View style={styles.patientIdBanner}>
+            <View style={styles.patientIdBannerLeft}>
+              <Ionicons name="finger-print" size={20} color={colors.primary} />
             </View>
-            <View style={styles.infoCol}>
-              <Text style={styles.infoLabel}>{t.sex}</Text>
-              <Text style={styles.infoValue}>{patientProfile.sex || '—'}</Text>
-            </View>
-            <View style={styles.infoCol}>
-              <Text style={styles.infoLabel}>Diabetes</Text>
-              <Text style={styles.infoValue}>
-                {patientProfile.hasDiabetes || '—'}
+            <View style={{ flex: 1 }}>
+              <Text style={styles.patientIdBannerLabel}>YOUR PATIENT ID</Text>
+              <Text style={styles.patientIdBannerValue}>
+                {patientProfile.patientId || '—'}
               </Text>
             </View>
           </View>
-
-          <TouchableOpacity
-            style={styles.actionButton}
-            activeOpacity={0.85}
-            onPress={() => navigate('eyeCamera')}
-          >
-            <Ionicons name="camera" size={18} color="#ffffff" style={{ marginRight: 8 }} />
-            <Text style={styles.actionButtonText}>Start Retinal Scan</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Quick Features List */}
@@ -384,5 +369,39 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '700',
     fontSize: 14,
+  },
+  patientIdBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: colors.primaryMuted,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+  },
+  patientIdBannerLeft: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#c7e3e5',
+  },
+  patientIdBannerLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    color: colors.primary,
+    marginBottom: 3,
+  },
+  patientIdBannerValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.textPrimary,
+    letterSpacing: 1,
   },
 });

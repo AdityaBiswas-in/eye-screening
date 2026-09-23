@@ -33,6 +33,7 @@ export interface PatientProfile {
   age: string;
   sex: SexOption | null;
   hasDiabetes: DiabetesOption | null;
+  patientId: string;
 }
 
 export interface WorkerProfile {
@@ -50,6 +51,7 @@ export interface EvidenceItem {
 
 export interface ScreeningRecord {
   id: string;
+  patientId?: string;
   initials: string;
   name: string;
   date: string;

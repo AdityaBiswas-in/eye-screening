@@ -30,6 +30,7 @@ export const WorkerDashboardScreen: React.FC = () => {
   // New screening form states
   const [newPatientName, setNewPatientName] = useState('');
   const [newPatientAge, setNewPatientAge] = useState('');
+  const [newPatientId, setNewPatientId] = useState('');
   const [selectedCondition, setSelectedCondition] = useState('No DR');
   const [selectedStatus, setSelectedStatus] = useState<'REFERABLE' | 'NON-REFERABLE'>('NON-REFERABLE');
 
@@ -46,6 +47,10 @@ export const WorkerDashboardScreen: React.FC = () => {
       Alert.alert('Missing Field', 'Please enter the patient name.');
       return;
     }
+    if (!newPatientId.trim()) {
+      Alert.alert('Missing Field', 'Please enter the Patient ID (e.g. PAT-A1B2C3) provided by the patient.');
+      return;
+    }
 
     const initials = newPatientName
       .trim()
@@ -57,6 +62,7 @@ export const WorkerDashboardScreen: React.FC = () => {
 
     const record: ScreeningRecord = {
       id: Date.now().toString(),
+      patientId: newPatientId.trim().toUpperCase(),
       initials: initials || 'PT',
       name: newPatientName.trim(),
       date: 'Today',
@@ -68,6 +74,7 @@ export const WorkerDashboardScreen: React.FC = () => {
     addScreening(record);
     setNewPatientName('');
     setNewPatientAge('');
+    setNewPatientId('');
     setShowScanModal(false);
   };
 
@@ -281,6 +288,18 @@ export const WorkerDashboardScreen: React.FC = () => {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.modalFieldLabel}>PATIENT ID</Text>
+              <TextInput
+                style={[styles.modalInput, styles.modalInputHighlight]}
+                placeholder="e.g. PAT-A1B2C3"
+                placeholderTextColor={colors.textLight}
+                value={newPatientId}
+                onChangeText={setNewPatientId}
+                autoCapitalize="characters"
+                autoCorrect={false}
+              />
+              <Text style={styles.modalFieldHint}>Ask the patient to share their ID from their profile.</Text>
+
               <Text style={styles.modalFieldLabel}>PATIENT FULL NAME</Text>
               <TextInput
                 style={styles.modalInput}
