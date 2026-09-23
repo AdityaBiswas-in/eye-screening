@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -28,10 +28,9 @@ export const ReportScreen: React.FC = () => {
   const record: ScreeningRecord | null =
     activeReportRecord || (screenings.length > 0 ? screenings[0] : null);
 
-  // Verification status simulation: allows frontend to demonstrate 'done' vs 'retake_needed'
-  const [qualityStatus, setQualityStatus] = useState<'done' | 'retake_needed'>(
-    record?.imageQualityStatus === 'retake_needed' ? 'retake_needed' : 'done'
-  );
+  // Quality status: defaults to record's status, or 'done'
+  const qualityStatus: 'done' | 'retake_needed' =
+    record?.imageQualityStatus === 'retake_needed' ? 'retake_needed' : 'done';
 
   const handleBack = () => {
     if (canGoBack) {
@@ -360,42 +359,6 @@ export const ReportScreen: React.FC = () => {
               <Text style={styles.contactBtnText}>📞 Contact Specialist Clinic</Text>
             </TouchableOpacity>
           )}
-        </View>
-
-        {/* Simulation toggle button for verifying backend states */}
-        <View style={styles.simulationBox}>
-          <Text style={styles.simulationLabel}>Backend Verification Demo Toggle:</Text>
-          <View style={styles.toggleRow}>
-            <TouchableOpacity
-              style={[
-                styles.toggleBtn,
-                qualityStatus === 'done' && styles.toggleBtnActive
-              ]}
-              onPress={() => setQualityStatus('done')}
-            >
-              <Text style={[
-                styles.toggleBtnText,
-                qualityStatus === 'done' && styles.toggleBtnTextActive
-              ]}>
-                Backend: Done
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.toggleBtn,
-                qualityStatus === 'retake_needed' && styles.toggleBtnActiveRed
-              ]}
-              onPress={() => setQualityStatus('retake_needed')}
-            >
-              <Text style={[
-                styles.toggleBtnText,
-                qualityStatus === 'retake_needed' && styles.toggleBtnTextActive
-              ]}>
-                Backend: Retake
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </ScrollView>
     </View>
@@ -890,50 +853,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 13.5,
     fontWeight: '700',
-  },
-  simulationBox: {
-    marginTop: 12,
-    padding: 14,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  simulationLabel: {
-    fontSize: 11.5,
-    fontWeight: '700',
-    color: '#64748b',
-    marginBottom: 8,
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  toggleBtn: {
-    flex: 1,
-    height: 36,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8fafc',
-  },
-  toggleBtnActive: {
-    backgroundColor: '#10b981',
-    borderColor: '#10b981',
-  },
-  toggleBtnActiveRed: {
-    backgroundColor: '#d97706',
-    borderColor: '#d97706',
-  },
-  toggleBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#475569',
-  },
-  toggleBtnTextActive: {
-    color: '#ffffff',
   },
   emptyContainer: {
     flex: 1,
