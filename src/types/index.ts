@@ -75,6 +75,13 @@ export interface ScreeningRecord {
   };
   gradCamAttention?: string;
   capturedImageUri?: string;
+  // Real API fields from POST /predict
+  gradCamBase64?: string;           // explainability.overlay_png_base64
+  uncertaintyLevel?: string;        // uncertainty.level
+  referableDR?: boolean;            // referable_dr.prediction
+  referableProbability?: number;    // referable_dr.probability
+  reviewRequired?: boolean;         // reliability.review_required
+  reviewReasons?: string[];         // reliability.review_reasons
 }
 
 export interface DoctorProfile {

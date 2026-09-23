@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { DiabetesOption, SexOption } from '../types';
@@ -41,6 +42,7 @@ export const PatientProfileScreen: React.FC = () => {
   const [isNameFocused, setIsNameFocused] = useState(false);
   const [isPhoneFocused, setIsPhoneFocused] = useState(false);
   const [isAgeFocused, setIsAgeFocused] = useState(false);
+  const [idCopied, setIdCopied] = useState(false);
 
   const handleContinue = () => {
     updatePatientProfile({
@@ -55,6 +57,13 @@ export const PatientProfileScreen: React.FC = () => {
       phoneNumber,
     });
     navigate('dashboard');
+  };
+
+  const copyPatientId = async () => {
+    if (!patientProfile.patientId) return;
+    await Clipboard.setStringAsync(patientProfile.patientId);
+    setIdCopied(true);
+    setTimeout(() => setIdCopied(false), 1800);
   };
 
   const sexOptions: { label: string; value: SexOption }[] = [
@@ -216,7 +225,14 @@ export const PatientProfileScreen: React.FC = () => {
             </View>
 
             {/* Patient ID Display Card */}
-            <View style={styles.patientIdCard}>
+            <TouchableOpacity
+              style={styles.patientIdCard}
+              activeOpacity={0.75}
+              onPress={copyPatientId}
+              disabled={!patientProfile.patientId}
+              accessibilityRole="button"
+              accessibilityLabel="Copy patient ID"
+            >
               <View style={styles.patientIdRow}>
                 <View style={styles.patientIdIconBox}>
                   <Ionicons name="finger-print" size={18} color={colors.primary} />
@@ -229,9 +245,13 @@ export const PatientProfileScreen: React.FC = () => {
                 </View>
               </View>
               <Text style={styles.patientIdHint}>
-                Share this ID with your field worker so they can link your screening results to your profile.
+                {patientProfile.patientId
+                  ? idCopied
+                    ? 'Patient ID copied to clipboard.'
+                    : 'Tap to copy, then share it with your field worker to link your screening results.'
+                  : 'Your ID will be generated after you save your profile.'}
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </ScrollView>
 

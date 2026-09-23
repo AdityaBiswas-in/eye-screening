@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { RetinaLogo, RetinaAppBrand } from '../components/RetinaLogo';
@@ -25,11 +26,19 @@ export const DashboardScreen: React.FC = () => {
 
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [idCopied, setIdCopied] = useState(false);
 
   const currentLang = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
   const handleSignOut = () => {
     signOut();
+  };
+
+  const copyPatientId = async () => {
+    if (!patientProfile.patientId) return;
+    await Clipboard.setStringAsync(patientProfile.patientId);
+    setIdCopied(true);
+    setTimeout(() => setIdCopied(false), 1800);
   };
 
   const displayName =
@@ -83,7 +92,14 @@ export const DashboardScreen: React.FC = () => {
           <View style={styles.divider} />
 
           {/* Patient ID Card */}
-          <View style={styles.patientIdBanner}>
+          <TouchableOpacity
+            style={styles.patientIdBanner}
+            activeOpacity={0.75}
+            onPress={copyPatientId}
+            disabled={!patientProfile.patientId}
+            accessibilityRole="button"
+            accessibilityLabel="Copy patient ID"
+          >
             <View style={styles.patientIdBannerLeft}>
               <Ionicons name="finger-print" size={20} color={colors.primary} />
             </View>
@@ -92,8 +108,14 @@ export const DashboardScreen: React.FC = () => {
               <Text style={styles.patientIdBannerValue}>
                 {patientProfile.patientId || '—'}
               </Text>
+              {!!patientProfile.patientId && (
+                <Text style={styles.patientIdCopyHint}>
+                  {idCopied ? 'Copied to clipboard' : 'Tap to copy'}
+                </Text>
+              )}
             </View>
-          </View>
+            <Ionicons name={idCopied ? 'checkmark-circle' : 'copy-outline'} size={19} color={colors.primary} />
+          </TouchableOpacity>
         </View>
 
         {/* Quick Features List */}
@@ -403,5 +425,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 1,
+  },
+  patientIdCopyHint: {
+    color: colors.primary,
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 3,
   },
 });

@@ -12,7 +12,7 @@ import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 
 export const EyeCameraScreen: React.FC = () => {
-  const { navigate, goBack, canGoBack, userRole } = useApp();
+  const { navigate, goBack, canGoBack, userRole, setCapturedImage } = useApp();
   const [isCapturing, setIsCapturing] = useState(false);
   const [goodLighting, setGoodLighting] = useState(true);
   const [retinaDetected, setRetinaDetected] = useState(true);
@@ -44,6 +44,10 @@ export const EyeCameraScreen: React.FC = () => {
       input.type = 'file';
       input.accept = 'image/*';
       input.onchange = () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        const uri = URL.createObjectURL(file);
+        setCapturedImage(uri, file);
         setIsCapturing(true);
         setTimeout(() => {
           setIsCapturing(false);

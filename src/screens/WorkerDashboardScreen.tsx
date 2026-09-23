@@ -881,6 +881,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textPrimary,
   },
+  modalInputHighlight: {
+    backgroundColor: colors.primaryMuted,
+    borderColor: colors.primary,
+  },
+  modalFieldHint: {
+    fontSize: 12,
+    color: colors.textMuted,
+    marginTop: 6,
+    marginBottom: 4,
+    lineHeight: 17,
+  },
   optionRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

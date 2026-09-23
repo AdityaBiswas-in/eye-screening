@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,16 +16,26 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { ScreeningRecord } from '../types';
+import {
+  checkHealth,
+  predictRetina,
+  mapLesionActivations,
+  mapImageQuality,
+} from '../api/predict';
 
 export const QualityCheckScreen: React.FC = () => {
-  const { navigate, addScreening, setActiveReportRecord, userRole, patientProfile, account } = useApp();
+  const { navigate, addScreening, setActiveReportRecord, userRole, patientProfile, account, capturedImageUri, capturedImageFile } = useApp();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [apiOnline, setApiOnline] = useState<boolean | null>(null); // null = checking
 
   // Patient detail entry modal/step states (specifically for worker flow: Camera -> Quality -> Patient Info)
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [patientFullName, setPatientFullName] = useState(
     userRole === 'patient' ? (patientProfile.fullName || account.fullName || '') : ''
+  );
+  const [patientId, setPatientId] = useState(
+    userRole === 'patient' ? patientProfile.patientId : ''
   );
   const [patientAge, setPatientAge] = useState(
     userRole === 'patient' ? (patientProfile.age || '') : ''
@@ -53,7 +63,7 @@ export const QualityCheckScreen: React.FC = () => {
     if (userRole === 'worker' || !patientProfile.fullName) {
       setShowPatientForm(true);
     } else {
-      runAiAnalysis(patientProfile.fullName || account.fullName || 'Screening Patient', patientProfile.age || '—');
+      runAiAnalysis(patientProfile.fullName || account.fullName || 'Screening Patient', patientProfile.age || '—', patientProfile.patientId);
     }
   };
 
@@ -62,16 +72,28 @@ export const QualityCheckScreen: React.FC = () => {
       Alert.alert('Required Field', 'Please enter the patient’s full name.');
       return;
     }
+    if (userRole === 'worker' && !patientId.trim()) {
+      Alert.alert('Required Field', 'Enter the Patient ID shared by the patient so this report is visible in their account.');
+      return;
+    }
     setShowPatientForm(false);
-    runAiAnalysis(patientFullName.trim(), patientAge.trim() || '—');
+    runAiAnalysis(patientFullName.trim(), patientAge.trim() || '—', patientId.trim().toUpperCase());
   };
 
   // Step-by-step progress tracking for the 'Analyzing retina' screen
   const [analysisStep, setAnalysisStep] = useState<number>(0);
   const [savedTargetName, setSavedTargetName] = useState<string>('');
   const [savedTargetAge, setSavedTargetAge] = useState<string>('');
+  const [savedTargetPatientId, setSavedTargetPatientId] = useState<string>('');
 
-  const finishAnalysis = (targetName: string, targetAge: string) => {
+  // Check API health on mount
+  useEffect(() => {
+    checkHealth()
+      .then(() => setApiOnline(true))
+      .catch(() => setApiOnline(false));
+  }, []);
+
+  const finishAnalysis = (targetName: string, targetAge: string, targetPatientId: string) => {
     const patientName = targetName || 'Screening Patient';
 
     const initials =
@@ -85,6 +107,7 @@ export const QualityCheckScreen: React.FC = () => {
 
     const newRecord: ScreeningRecord = {
       id: Date.now().toString(),
+      patientId: targetPatientId || undefined,
       initials,
       name: patientName,
       date: 'Today',
@@ -117,31 +140,94 @@ export const QualityCheckScreen: React.FC = () => {
     setAnalysisComplete(true);
   };
 
-  const runAiAnalysis = (targetName: string, targetAge: string) => {
+  const runAiAnalysis = async (targetName: string, targetAge: string, targetPatientId: string) => {
     setSavedTargetName(targetName);
     setSavedTargetAge(targetAge);
+    setSavedTargetPatientId(targetPatientId);
     setIsAnalyzing(true);
-    setAnalysisStep(1); // Checking image
+    setAnalysisStep(1);
 
-    setTimeout(() => {
-      setAnalysisStep(2); // Analyzing retina
-    }, 900);
+    // If no image was captured/uploaded, fall back to mock
+    if (!capturedImageUri) {
+      setTimeout(() => setAnalysisStep(2), 900);
+      setTimeout(() => setAnalysisStep(3), 1800);
+      setTimeout(() => setAnalysisStep(4), 2700);
+      setTimeout(() => finishAnalysis(targetName, targetAge, targetPatientId), 3600);
+      return;
+    }
 
-    setTimeout(() => {
-      setAnalysisStep(3); // Looking for signs of diabetic retinopathy
-    }, 1800);
+    try {
+      setAnalysisStep(2);
+      const result = await predictRetina(capturedImageUri, capturedImageFile ?? undefined);
+      setAnalysisStep(3);
 
-    setTimeout(() => {
-      setAnalysisStep(4); // Preparing result
-    }, 2700);
+      const patientName = targetName || 'Screening Patient';
+      const initials = patientName
+        .trim().split(' ').map((p: string) => p[0]).join('').substring(0, 2).toUpperCase() || 'SP';
 
-    setTimeout(() => {
-      finishAnalysis(targetName, targetAge);
-    }, 3600);
+      const isReferable = result.referable_dr.prediction;
+      const drLabel = result.dr.label || 'No DR';
+      const confidence = Math.round((result.dr.confidence ?? 0) * 100);
+      const iqLabel = mapImageQuality(result.image_quality);
+      const evidence = mapLesionActivations(result.lesions?.activations ?? {});
+
+      setAnalysisStep(4);
+
+      const newRecord: ScreeningRecord = {
+        id: Date.now().toString(),
+        patientId: targetPatientId || undefined,
+        initials,
+        name: patientName,
+        date: 'Today',
+        age: targetAge || '—',
+        condition: drLabel,
+        status: isReferable ? 'REFERABLE' : 'NON-REFERABLE',
+        drGrade: drLabel,
+        aiConfidence: confidence,
+        imageQuality: iqLabel,
+        imageQualityStatus: result.image_quality.gradable ? 'done' : 'retake_needed',
+        imageQualityMessage: result.image_quality.gradable
+          ? 'Adaptive preprocessing completed successfully.'
+          : 'Image quality insufficient — please retake.',
+        evidence: evidence.length > 0 ? evidence : [
+          { name: 'Microaneurysm-like regions', level: 'None', color: 'green' },
+          { name: 'Hemorrhage-like regions', level: 'None', color: 'green' },
+          { name: 'Hard exudate-like regions', level: 'None', color: 'green' },
+        ],
+        recommendation: result.recommendation || 'Routine annual dilated retinal screening advised.',
+        capturedImageUri: capturedImageUri ?? undefined,
+        // Real API fields
+        gradCamBase64: result.explainability?.overlay_png_base64 ?? undefined,
+        uncertaintyLevel: result.uncertainty?.level,
+        referableDR: result.referable_dr.prediction,
+        referableProbability: result.referable_dr.probability,
+        reviewRequired: result.reliability?.review_required,
+        reviewReasons: result.reliability?.review_reasons,
+        recommendedDoctor: {
+          name: 'Dr. Sarah Jenkins, MD',
+          specialty: 'Retina Specialist & Vitreoretinal Surgeon',
+          hospital: 'Apex Eye Institute & Research Hospital',
+          contact: '+91 98765 43210',
+          timeframe: isReferable ? 'Within 4–6 weeks' : 'Annual routine screening (12 months)',
+        },
+      };
+
+      addScreening(newRecord);
+      setActiveReportRecord(newRecord);
+      setIsAnalyzing(false);
+      setAnalysisComplete(true);
+    } catch {
+      setIsAnalyzing(false);
+      Alert.alert(
+        'AI Server Error',
+        'Could not reach the AI server. Please check your connection and try again.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const handleSkipAnalysis = () => {
-    finishAnalysis(savedTargetName, savedTargetAge);
+    finishAnalysis(savedTargetName, savedTargetAge, savedTargetPatientId);
   };
 
   return (
@@ -166,9 +252,11 @@ export const QualityCheckScreen: React.FC = () => {
           </View>
 
           <View style={styles.topRightRow}>
-            <View style={styles.offlineBadge}>
-              <View style={styles.offlineDot} />
-              <Text style={styles.offlineText}>OFFLINE</Text>
+            <View style={[styles.offlineBadge, apiOnline === true && styles.onlineBadge]}>
+              <View style={[styles.offlineDot, apiOnline === true && styles.onlineDot]} />
+              <Text style={[styles.offlineText, apiOnline === true && styles.onlineText]}>
+                {apiOnline === null ? 'CHECKING' : apiOnline ? 'ONLINE' : 'OFFLINE'}
+              </Text>
             </View>
 
             <TouchableOpacity
@@ -294,6 +382,18 @@ export const QualityCheckScreen: React.FC = () => {
               </Text>
 
               <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 380 }}>
+                <Text style={styles.inputLabel}>PATIENT ID *</Text>
+                <TextInput
+                  style={styles.inputField}
+                  placeholder="e.g. PAT-A1B2C3"
+                  placeholderTextColor={colors.textLight}
+                  value={patientId}
+                  onChangeText={(value) => setPatientId(value.toUpperCase())}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                />
+                <Text style={styles.patientIdHint}>Ask the patient to copy and share the ID from their profile.</Text>
+
                 {/* Patient Full Name */}
                 <Text style={styles.inputLabel}>PATIENT FULL NAME *</Text>
                 <TextInput
@@ -601,25 +701,35 @@ const styles = StyleSheet.create({
   offlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ecfdf5',
+    backgroundColor: '#fef2f2',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#a7f3d0',
+    borderColor: '#fca5a5',
   },
   offlineDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#10b981',
+    backgroundColor: '#ef4444',
     marginRight: 4,
   },
   offlineText: {
     fontSize: 9.5,
     fontWeight: '800',
-    color: '#065f46',
+    color: '#991b1b',
     letterSpacing: 0.5,
+  },
+  onlineBadge: {
+    backgroundColor: '#ecfdf5',
+    borderColor: '#a7f3d0',
+  },
+  onlineDot: {
+    backgroundColor: '#10b981',
+  },
+  onlineText: {
+    color: '#065f46',
   },
   exitButton: {
     width: 36,
@@ -1032,6 +1142,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '700',
     fontSize: 15,
+  },
+  patientIdHint: {
+    color: colors.textMuted,
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 6,
+    marginBottom: 2,
   },
   // 'Analyzing retina' Fullscreen HUD styles
   analyzingOverlay: {

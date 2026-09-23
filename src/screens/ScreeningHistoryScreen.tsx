@@ -49,8 +49,11 @@ export const ScreeningHistoryScreen: React.FC = () => {
       ? '· Diabetes: Not sure'
       : '';
 
-  // Only genuine screenings captured via AI camera or entered by user/screener
-  const allRecords: HistoryRecord[] = screenings.map((s, idx) => ({
+  // A patient only sees records carrying their own patient ID.
+  const patientScreenings = screenings.filter(
+    (screening) => !!patientProfile.patientId && screening.patientId === patientProfile.patientId
+  );
+  const allRecords: HistoryRecord[] = patientScreenings.map((s, idx) => ({
     id: s.id || `rec-${idx}`,
     date: s.date || 'Today',
     condition: s.condition || 'No DR',
@@ -70,7 +73,7 @@ export const ScreeningHistoryScreen: React.FC = () => {
 
   const handleShowDetails = (rec: HistoryRecord) => {
     // Find matching screening record or construct one
-    const matchingScreening = screenings.find((s) => s.id === rec.id) || {
+    const matchingScreening = patientScreenings.find((s) => s.id === rec.id) || {
       id: rec.id,
       initials,
       name: patientName,
@@ -134,14 +137,7 @@ export const ScreeningHistoryScreen: React.FC = () => {
             <Text style={styles.emptySubtitle}>
               You have not recorded any eye screenings yet. Capture a retinal image using the camera to view AI diagnostic findings and track disease progression over time.
             </Text>
-            <TouchableOpacity
-              style={styles.emptyActionBtn}
-              activeOpacity={0.85}
-              onPress={() => navigate('eyeCamera')}
-            >
-              <Ionicons name="camera-outline" size={17} color="#ffffff" style={{ marginRight: 6 }} />
-              <Text style={styles.emptyActionBtnText}>Start Retinal Scan</Text>
-            </TouchableOpacity>
+
           </View>
         ) : (
           <>

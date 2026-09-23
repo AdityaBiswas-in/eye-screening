@@ -116,20 +116,47 @@ export const ReportScreen: React.FC = () => {
   const [showOverrideModal, setShowOverrideModal] = useState(false);
   const [decisionMessage, setDecisionMessage] = useState('');
 
-  // If active record not set, fallback to the latest screening or null
+  const patientScreenings = screenings.filter(
+    (screening) => !!patientProfile.patientId && screening.patientId === patientProfile.patientId
+  );
+  const visibleActiveRecord =
+    userRole === 'patient' && activeReportRecord?.patientId !== patientProfile.patientId
+      ? null
+      : activeReportRecord;
+
+  // Patients may only see reports linked to their own ID; staff can see the latest report.
   const record: ScreeningRecord | null =
-    activeReportRecord || (screenings.length > 0 ? screenings[0] : null);
+    visibleActiveRecord ||
+    (userRole === 'patient'
+      ? (patientScreenings[0] || null)
+      : (screenings[0] || null));
 
   const activeModality =
     VIEW_MODALITIES.find((m) => m.id === selectedView) || VIEW_MODALITIES[0];
 
-  const retinaSource = record?.capturedImageUri
+  // Base retina image (original or captured)
+  const originalSource = record?.capturedImageUri
     ? { uri: record.capturedImageUri }
     : require('../../assets/fundus_sample.jpg');
+
+  // Grad-CAM overlay — use real base64 from API when available
+  const gradCamSource = record?.gradCamBase64
+    ? { uri: `data:image/png;base64,${record.gradCamBase64}` }
+    : originalSource;
+
+  // Active image shown in the viewer depends on selected modality
+  const retinaSource = selectedView === 'gradcam' ? gradCamSource : originalSource;
 
   // Quality status: defaults to record's status, or 'done'
   const qualityStatus: 'done' | 'retake_needed' =
     record?.imageQualityStatus === 'retake_needed' ? 'retake_needed' : 'done';
+
+  // Real API fields (with fallbacks)
+  const referableDR = record?.referableDR ?? (record?.status === 'REFERABLE');
+  const referableProbability = record?.referableProbability;
+  const uncertaintyLevel = record?.uncertaintyLevel;
+  const reviewRequired = record?.reviewRequired ?? false;
+  const reviewReasons = record?.reviewReasons ?? [];
 
   const handleBack = () => {
     if (canGoBack) {
@@ -175,7 +202,7 @@ export const ReportScreen: React.FC = () => {
     timeframe: 'Recommended consultation within 30 days',
   };
 
-  if (!record && screenings.length === 0) {
+  if (!record && (userRole === 'patient' ? patientScreenings.length === 0 : screenings.length === 0)) {
     return (
       <View style={styles.container}>
         <View style={styles.topHeader}>
@@ -261,6 +288,11 @@ export const ReportScreen: React.FC = () => {
           </View>
           <View style={styles.patientMetaCol}>
             <Text style={styles.patientBannerName}>{patientName}</Text>
+            {record?.patientId ? (
+              <Text style={{ fontSize: 11, color: '#0369a1', fontWeight: '700', marginBottom: 1 }}>
+                ID: {record.patientId}
+              </Text>
+            ) : null}
             <Text style={styles.patientBannerSub}>
               Age {patientAge} · Date: {record?.date || 'Today'}
             </Text>
@@ -332,9 +364,12 @@ export const ReportScreen: React.FC = () => {
               <Text style={styles.metaLabel}>Referable</Text>
               <Text style={[
                 styles.metaValue,
-                status === 'REFERABLE' ? styles.textRed : styles.textGreen
+                referableDR ? styles.textRed : styles.textGreen
               ]}>
-                {status === 'REFERABLE' ? 'Yes' : 'No'}
+                {referableDR ? 'Yes' : 'No'}
+                {referableProbability !== undefined
+                  ? ` (${Math.round(referableProbability * 100)}%)`
+                  : ''}
               </Text>
             </View>
 
@@ -342,6 +377,20 @@ export const ReportScreen: React.FC = () => {
               <Text style={styles.metaLabel}>Image quality</Text>
               <Text style={styles.metaValue}>{imageQuality}</Text>
             </View>
+
+            {uncertaintyLevel ? (
+              <View style={styles.resultCol}>
+                <Text style={styles.metaLabel}>Uncertainty</Text>
+                <Text style={[
+                  styles.metaValue,
+                  uncertaintyLevel === 'high' ? styles.textRed
+                    : uncertaintyLevel === 'moderate' ? { color: '#d97706' }
+                    : styles.textGreen
+                ]}>
+                  {uncertaintyLevel.charAt(0).toUpperCase() + uncertaintyLevel.slice(1)}
+                </Text>
+              </View>
+            ) : null}
           </View>
 
           <View style={styles.confidenceRow}>
@@ -355,10 +404,29 @@ export const ReportScreen: React.FC = () => {
               style={[
                 styles.progressBar,
                 { width: `${confidence}%` },
-                status === 'REFERABLE' ? styles.progressReferable : styles.progressNonReferable
+                referableDR ? styles.progressReferable : styles.progressNonReferable
               ]}
             />
           </View>
+
+          {/* Review Required Banner */}
+          {reviewRequired && (
+            <View style={{
+              marginTop: 12,
+              backgroundColor: '#fef3c7',
+              borderRadius: 10,
+              padding: 10,
+              borderLeftWidth: 3,
+              borderLeftColor: '#f59e0b',
+            }}>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: '#92400e', marginBottom: 2 }}>
+                ⚠ Manual Review Required
+              </Text>
+              {reviewReasons.map((reason, i) => (
+                <Text key={i} style={{ fontSize: 11, color: '#78350f' }}>• {reason}</Text>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Evidence Card */}

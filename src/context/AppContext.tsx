@@ -45,6 +45,10 @@ interface AppContextType {
   goBack: () => void;
   canGoBack: boolean;
   signOut: () => void;
+  // Captured image passed from EyeCameraScreen → QualityCheckScreen → API
+  capturedImageUri: string | null;
+  capturedImageFile: File | null;
+  setCapturedImage: (uri: string | null, file?: File | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -60,6 +64,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   });
   const [screenings, setScreenings] = useState<ScreeningRecord[]>([]);
   const [activeReportRecord, setActiveReportRecord] = useState<ScreeningRecord | null>(null);
+  const [capturedImageUri, setCapturedImageUri] = useState<string | null>(null);
+  const [capturedImageFile, setCapturedImageFile] = useState<File | null>(null);
+
+  const setCapturedImage = (uri: string | null, file: File | null = null) => {
+    setCapturedImageUri(uri);
+    setCapturedImageFile(file);
+  };
   const [patientProfile, setPatientProfile] = useState<PatientProfile>({
     fullName: '',
     phoneNumber: '',
@@ -180,6 +191,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         goBack,
         canGoBack,
         signOut,
+        capturedImageUri,
+        capturedImageFile,
+        setCapturedImage,
       }}
     >
       {children}
