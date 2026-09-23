@@ -7,6 +7,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { RetinaLogo } from '../components/RetinaLogo';
@@ -29,8 +30,9 @@ export const WelcomeScreen: React.FC = () => {
           activeOpacity={0.7}
           onPress={() => setShowLanguageModal(true)}
         >
+          <Ionicons name="globe-outline" size={16} color="#0284c7" />
           <Text style={styles.langPillText}>{currentLangObj.englishName}</Text>
-          <Text style={styles.langPillChevron}>▾</Text>
+          <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
         </TouchableOpacity>
       </View>
 
@@ -40,7 +42,7 @@ export const WelcomeScreen: React.FC = () => {
       >
         {/* Center Graphic */}
         <View style={styles.logoSection}>
-          <RetinaLogo size={98} />
+          <RetinaLogo size={104} />
         </View>
 
         {/* Brand & Titles */}
@@ -53,22 +55,22 @@ export const WelcomeScreen: React.FC = () => {
         {/* 3 Pillars / Value Props */}
         <View style={styles.featuresRow}>
           <View style={styles.featureItem}>
-            <View style={styles.iconCircle}>
-              <Text style={styles.featureEmoji}>🏥</Text>
+            <View style={[styles.iconCircle, { backgroundColor: '#eff6ff' }]}>
+              <MaterialCommunityIcons name="hospital-box-outline" size={20} color="#0284c7" />
             </View>
             <Text style={styles.featureLabel}>{t.whoAligned}</Text>
           </View>
 
           <View style={styles.featureItem}>
-            <View style={styles.iconCircle}>
-              <Text style={styles.featureEmoji}>🔒</Text>
+            <View style={[styles.iconCircle, { backgroundColor: '#f0fdf4' }]}>
+              <Ionicons name="shield-checkmark-outline" size={20} color="#16a34a" />
             </View>
             <Text style={styles.featureLabel}>{t.securePrivate}</Text>
           </View>
 
           <View style={styles.featureItem}>
-            <View style={styles.iconCircle}>
-              <Text style={styles.featureEmoji}>🌐</Text>
+            <View style={[styles.iconCircle, { backgroundColor: '#fdf2f8' }]}>
+              <Ionicons name="language-outline" size={20} color="#db2777" />
             </View>
             <Text style={styles.featureLabel}>{t.languagesCount}</Text>
           </View>

@@ -10,12 +10,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { ScreeningRecord } from '../types';
 import { LanguageModal } from '../components/LanguageModal';
 import { ProfileModal } from '../components/ProfileModal';
 import { LANGUAGES } from '../i18n/translations';
+import { RetinaAppBrand } from '../components/RetinaLogo';
 
 export const WorkerDashboardScreen: React.FC = () => {
   const { navigate, screenings, addScreening, signOut, language, viewReport } = useApp();
@@ -77,8 +79,11 @@ export const WorkerDashboardScreen: React.FC = () => {
       >
         {/* Top Header */}
         <View style={styles.topHeader}>
-          <View>
-            <Text style={styles.tag}>GOOD MORNING</Text>
+          <View style={{ flex: 1 }}>
+            <View style={{ marginBottom: 6 }}>
+              <RetinaAppBrand size={26} />
+            </View>
+            <Text style={styles.tag}>HEALTHCARE FIELD WORKER</Text>
             <Text style={styles.title}>Ready for the next{'\n'}screening?</Text>
           </View>
 
@@ -89,7 +94,8 @@ export const WorkerDashboardScreen: React.FC = () => {
               activeOpacity={0.7}
               onPress={() => setShowLanguageModal(true)}
             >
-              <Text style={styles.langPillText}>🌐 {currentLang.nativeName}</Text>
+              <Ionicons name="globe-outline" size={14} color="#0284c7" />
+              <Text style={styles.langPillText}>{currentLang.nativeName}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -97,7 +103,7 @@ export const WorkerDashboardScreen: React.FC = () => {
               activeOpacity={0.7}
               onPress={() => setShowProfileModal(true)}
             >
-              <Text style={styles.profileIconText}>👤</Text>
+              <Ionicons name="person-circle-outline" size={24} color="#0284c7" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -112,7 +118,7 @@ export const WorkerDashboardScreen: React.FC = () => {
                 )
               }
             >
-              <Text style={styles.bellIcon}>🔔</Text>
+              <Ionicons name="notifications-outline" size={19} color="#0284c7" />
             </TouchableOpacity>
           </View>
         </View>
@@ -180,7 +186,7 @@ export const WorkerDashboardScreen: React.FC = () => {
         {/* Screening Cards or Empty State */}
         {screenings.length === 0 ? (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyEmoji}>📋</Text>
+            <MaterialCommunityIcons name="clipboard-text-outline" size={36} color="#94a3b8" />
             <Text style={styles.emptyTitle}>No screenings recorded yet</Text>
             <Text style={styles.emptySubtitle}>
               Captured fundus screenings will appear here once submitted.
@@ -249,7 +255,8 @@ export const WorkerDashboardScreen: React.FC = () => {
           activeOpacity={0.75}
           onPress={handleSignOut}
         >
-          <Text style={styles.signOutBannerButtonText}>🚪 Sign Out of RetinaCare</Text>
+          <Ionicons name="log-out-outline" size={19} color="#dc2626" />
+          <Text style={styles.signOutBannerButtonText}>Sign Out of RetinaCare</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -269,7 +276,7 @@ export const WorkerDashboardScreen: React.FC = () => {
               <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>New Eye Screening</Text>
               <TouchableOpacity onPress={() => setShowScanModal(false)}>
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={22} color="#64748b" />
               </TouchableOpacity>
             </View>
 
@@ -934,8 +941,10 @@ const styles = StyleSheet.create({
     borderColor: '#fca5a5',
     borderRadius: 16,
     paddingVertical: 14,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
     shadowColor: colors.shadowColor,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,

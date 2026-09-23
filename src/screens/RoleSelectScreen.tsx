@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { UserRole } from '../types';
@@ -29,25 +30,29 @@ export const RoleSelectScreen: React.FC = () => {
     id: UserRole;
     title: string;
     desc: string;
-    iconEmoji: string;
+    iconType: 'ionicons' | 'material' | 'fa5';
+    iconName: string;
   }[] = [
     {
       id: 'patient',
       title: t.patientTitle,
       desc: t.patientDesc,
-      iconEmoji: '👁️',
+      iconType: 'ionicons',
+      iconName: 'eye-outline',
     },
     {
       id: 'worker',
       title: t.workerTitle,
       desc: t.workerDesc,
-      iconEmoji: '📷',
+      iconType: 'material',
+      iconName: 'camera-iris',
     },
     {
       id: 'doctor',
       title: t.doctorTitle,
       desc: t.doctorDesc,
-      iconEmoji: '🩺',
+      iconType: 'fa5',
+      iconName: 'user-md',
     },
   ];
 
@@ -61,7 +66,8 @@ export const RoleSelectScreen: React.FC = () => {
         <View style={styles.header}>
           {canGoBack && (
             <TouchableOpacity onPress={goBack} style={styles.backButton}>
-              <Text style={styles.backButtonText}>← {t.back}</Text>
+              <Ionicons name="arrow-back" size={20} color={colors.textPrimary} />
+              <Text style={styles.backButtonText}>{t.back}</Text>
             </TouchableOpacity>
           )}
           <Text style={styles.brandTag}>{t.appName}</Text>
@@ -89,7 +95,27 @@ export const RoleSelectScreen: React.FC = () => {
                     isSelected ? styles.iconBoxSelected : styles.iconBoxUnselected,
                   ]}
                 >
-                  <Text style={styles.iconEmoji}>{role.iconEmoji}</Text>
+                  {role.iconType === 'ionicons' && (
+                    <Ionicons
+                      name={role.iconName as any}
+                      size={24}
+                      color={isSelected ? colors.primary : '#64748b'}
+                    />
+                  )}
+                  {role.iconType === 'material' && (
+                    <MaterialCommunityIcons
+                      name={role.iconName as any}
+                      size={24}
+                      color={isSelected ? colors.primary : '#64748b'}
+                    />
+                  )}
+                  {role.iconType === 'fa5' && (
+                    <FontAwesome5
+                      name={role.iconName as any}
+                      size={22}
+                      color={isSelected ? colors.primary : '#64748b'}
+                    />
+                  )}
                 </View>
 
                 {/* Details */}

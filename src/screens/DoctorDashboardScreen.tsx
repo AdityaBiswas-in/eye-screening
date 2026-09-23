@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { LanguageModal } from '../components/LanguageModal';
 import { ProfileModal } from '../components/ProfileModal';
 import { LANGUAGES } from '../i18n/translations';
+import { RetinaAppBrand } from '../components/RetinaLogo';
 
 interface PriorityCase {
   id: string;
@@ -60,7 +62,10 @@ export const DoctorDashboardScreen: React.FC = () => {
       >
         {/* Top Header */}
         <View style={styles.topHeader}>
-          <View>
+          <View style={{ flex: 1 }}>
+            <View style={{ marginBottom: 6 }}>
+              <RetinaAppBrand size={26} />
+            </View>
             <Text style={styles.greetingText}>Good afternoon, Dr.</Text>
             <Text style={styles.doctorNameText}>{doctorName}</Text>
           </View>
@@ -71,7 +76,8 @@ export const DoctorDashboardScreen: React.FC = () => {
               activeOpacity={0.7}
               onPress={() => setShowLanguageModal(true)}
             >
-              <Text style={styles.langPillText}>🌐 {currentLang.nativeName}</Text>
+              <Ionicons name="globe-outline" size={14} color="#0284c7" />
+              <Text style={styles.langPillText}>{currentLang.nativeName}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -79,7 +85,7 @@ export const DoctorDashboardScreen: React.FC = () => {
               activeOpacity={0.7}
               onPress={() => setShowProfileModal(true)}
             >
-              <Text style={styles.profileIcon}>👤</Text>
+              <Ionicons name="person-circle-outline" size={24} color="#0284c7" />
             </TouchableOpacity>
           </View>
         </View>
@@ -218,7 +224,7 @@ export const DoctorDashboardScreen: React.FC = () => {
           onPress={() => navigate('doctorQueue')}
         >
           <View style={styles.queueIconBox}>
-            <Text style={styles.queueIcon}>📋</Text>
+            <MaterialCommunityIcons name="clipboard-pulse-outline" size={24} color="#0284c7" />
           </View>
 
           <View style={styles.queueBannerText}>
@@ -228,7 +234,7 @@ export const DoctorDashboardScreen: React.FC = () => {
             </Text>
           </View>
 
-          <Text style={styles.chevronIcon}>›</Text>
+          <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
         </TouchableOpacity>
 
         {/* Prominent Sign Out Button */}
@@ -237,7 +243,8 @@ export const DoctorDashboardScreen: React.FC = () => {
           activeOpacity={0.75}
           onPress={handleSignOut}
         >
-          <Text style={styles.signOutBannerButtonText}>🚪 Sign Out of RetinaCare</Text>
+          <Ionicons name="log-out-outline" size={19} color="#dc2626" />
+          <Text style={styles.signOutBannerButtonText}>Sign Out of RetinaCare</Text>
         </TouchableOpacity>
       </ScrollView>
 

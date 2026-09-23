@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { LANGUAGES } from '../i18n/translations';
@@ -48,7 +49,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
             activeOpacity={0.7}
             onPress={onClose}
           >
-            <Text style={styles.closeBtnText}>✕</Text>
+            <Ionicons name="close" size={20} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
 

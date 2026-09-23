@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 
@@ -39,7 +40,8 @@ export const CreateAccountScreen: React.FC = () => {
           <View style={styles.header}>
             {canGoBack && (
               <TouchableOpacity onPress={goBack} style={styles.backButton}>
-                <Text style={styles.backButtonText}>← {t.back}</Text>
+                <Ionicons name="arrow-back" size={20} color={colors.textPrimary} />
+                <Text style={styles.backButtonText}>{t.back}</Text>
               </TouchableOpacity>
             )}
             <Text style={styles.brandTag}>{t.appName}</Text>
