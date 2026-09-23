@@ -190,12 +190,6 @@ export const QualityCheckScreen: React.FC = () => {
             style={styles.fundusImage}
             resizeMode="cover"
           />
-          <View style={styles.imageOverlayInfo}>
-            <View style={styles.scanIconFrame}>
-              <Text style={styles.scanDocIcon}>📄</Text>
-            </View>
-            <Text style={styles.imageCaption}>Sample OS Fundus Image</Text>
-          </View>
         </View>
 
         {/* Gradable Image Banner */}
@@ -663,7 +657,7 @@ const styles = StyleSheet.create({
   fundusImage: {
     width: '100%',
     height: '100%',
-    opacity: 0.9,
+    opacity: 1,
   },
   imageOverlayInfo: {
     position: 'absolute',
