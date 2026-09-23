@@ -23,61 +23,33 @@ interface HistoryRecord {
 export const ScreeningHistoryScreen: React.FC = () => {
   const { goBack, canGoBack, navigate, patientProfile, account, screenings } = useApp();
 
-  // Dynamic patient header info
+  // Dynamic patient header info from user profile/account
   const patientName =
-    patientProfile.fullName || account.fullName || 'Priya Sharma';
+    patientProfile.fullName || account.fullName || 'Patient Profile';
 
-  const initials = patientName
-    .trim()
-    .split(' ')
-    .map((p) => p[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase() || 'PS';
+  const initials =
+    (patientProfile.fullName || account.fullName)
+      ? (patientProfile.fullName || account.fullName)
+          .trim()
+          .split(' ')
+          .map((p) => p[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase()
+      : 'PT';
 
-  const patientAge = patientProfile.age || '58';
-  const patientSex = patientProfile.sex || 'Female';
+  const patientAge = patientProfile.age ? `Age ${patientProfile.age}` : 'Age: —';
+  const patientSex = patientProfile.sex ? `· ${patientProfile.sex}` : '';
   const patientDiabetes =
     patientProfile.hasDiabetes === 'Yes'
-      ? 'Diabetes 12 years'
+      ? '· Diabetes'
       : patientProfile.hasDiabetes === 'Not sure'
-      ? 'Diabetes status not sure'
-      : 'Diabetes 12 years';
+      ? '· Diabetes: Not sure'
+      : '';
 
-  // Base clinical history records matching design
-  const defaultRecords: HistoryRecord[] = [
-    {
-      id: 'rec-1',
-      date: '15 Sep 2026',
-      condition: 'Moderate DR',
-      status: 'REFERABLE',
-      confidence: 93,
-      quality: 'Good',
-      color: 'red',
-    },
-    {
-      id: 'rec-2',
-      date: '20 Mar 2026',
-      condition: 'Mild DR',
-      status: 'NON-REFERABLE',
-      confidence: 88,
-      quality: 'Good',
-      color: 'amber',
-    },
-    {
-      id: 'rec-3',
-      date: '10 Sep 2025',
-      condition: 'No DR',
-      status: 'NON-REFERABLE',
-      confidence: 97,
-      quality: 'Excellent',
-      color: 'green',
-    },
-  ];
-
-  // Map any live screenings captured via AI camera into the timeline
-  const liveRecords: HistoryRecord[] = screenings.map((s, idx) => ({
-    id: s.id || `live-${idx}`,
+  // Only genuine screenings captured via AI camera or entered by user/screener
+  const allRecords: HistoryRecord[] = screenings.map((s, idx) => ({
+    id: s.id || `rec-${idx}`,
     date: s.date || 'Today',
     condition: s.condition || 'No DR',
     status: s.status,
@@ -85,8 +57,6 @@ export const ScreeningHistoryScreen: React.FC = () => {
     quality: 'Good',
     color: s.status === 'REFERABLE' ? 'red' : 'green',
   }));
-
-  const allRecords = [...liveRecords, ...defaultRecords];
 
   const handleBack = () => {
     if (canGoBack) {
@@ -134,39 +104,54 @@ export const ScreeningHistoryScreen: React.FC = () => {
           <View style={styles.patientInfo}>
             <Text style={styles.patientName}>{patientName}</Text>
             <Text style={styles.patientMeta}>
-              Age {patientAge} · {patientSex} · {patientDiabetes}
+              {patientAge} {patientSex} {patientDiabetes}
             </Text>
           </View>
         </View>
 
-        {/* DR Progression Section */}
-        <View style={styles.progressionSection}>
-          <Text style={styles.sectionLabel}>DR PROGRESSION</Text>
-
-          {/* 3 Progress Bars matching screenshot */}
-          <View style={styles.barsContainer}>
-            {/* Green Bar (Sep 2025) */}
-            <View style={styles.barCol}>
-              <View style={[styles.bar, styles.barGreen]} />
-              <Text style={styles.barDate}>Sep 2025</Text>
+        {allRecords.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <View style={styles.emptyIconCircle}>
+              <Text style={styles.emptyIconText}>📋</Text>
             </View>
-
-            {/* Amber Bar (Mar 2026) */}
-            <View style={styles.barCol}>
-              <View style={[styles.bar, styles.barAmber]} />
-              <Text style={styles.barDate}>Mar 2026</Text>
-            </View>
-
-            {/* Red Bar (Sep 2026) */}
-            <View style={styles.barCol}>
-              <View style={[styles.bar, styles.barRed]} />
-              <Text style={styles.barDate}>Sep 2026</Text>
-            </View>
+            <Text style={styles.emptyTitle}>No screening records yet</Text>
+            <Text style={styles.emptySubtitle}>
+              You have not recorded any eye screenings yet. Capture a retinal image using the camera to view AI diagnostic findings and track disease progression over time.
+            </Text>
+            <TouchableOpacity
+              style={styles.emptyActionBtn}
+              activeOpacity={0.85}
+              onPress={() => navigate('eyeCamera')}
+            >
+              <Text style={styles.emptyActionBtnText}>📸 Start Retinal Scan</Text>
+            </TouchableOpacity>
           </View>
-        </View>
+        ) : (
+          <>
+            {/* DR Progression Section */}
+            <View style={styles.progressionSection}>
+              <Text style={styles.sectionLabel}>DR PROGRESSION</Text>
+              <View style={styles.barsContainer}>
+                {allRecords.slice(0, 4).reverse().map((rec) => (
+                  <View key={rec.id} style={styles.barCol}>
+                    <View
+                      style={[
+                        styles.bar,
+                        rec.color === 'red'
+                          ? styles.barRed
+                          : rec.color === 'amber'
+                          ? styles.barAmber
+                          : styles.barGreen,
+                      ]}
+                    />
+                    <Text style={styles.barDate}>{rec.date}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
 
-        {/* Timeline Records */}
-        <View style={styles.timelineWrapper}>
+            {/* Timeline Records */}
+            <View style={styles.timelineWrapper}>
           {/* Continuous vertical connector line */}
           <View style={styles.timelineLine} />
 
@@ -237,6 +222,8 @@ export const ScreeningHistoryScreen: React.FC = () => {
             })}
           </View>
         </View>
+        </>
+      )}
       </ScrollView>
     </View>
   );
@@ -328,6 +315,64 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     color: colors.textMuted,
     fontWeight: '500',
+  },
+  emptyCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 22,
+    paddingVertical: 36,
+    paddingHorizontal: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.shadowColor,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    marginTop: 8,
+  },
+  emptyIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  emptyIconText: {
+    fontSize: 28,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.textPrimary,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 13.5,
+    color: colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  emptyActionBtn: {
+    backgroundColor: colors.primary,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  emptyActionBtnText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '700',
   },
   progressionSection: {
     marginBottom: 26,
