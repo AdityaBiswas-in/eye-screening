@@ -188,7 +188,7 @@ export const WorkerDashboardScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.emptyButton}
               activeOpacity={0.8}
-              onPress={() => setShowScanModal(true)}
+              onPress={() => navigate('eyeCamera')}
             >
               <Text style={styles.emptyButtonText}>+ Record First Screening</Text>
             </TouchableOpacity>

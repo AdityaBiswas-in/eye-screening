@@ -7,6 +7,10 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
@@ -16,6 +20,17 @@ export const QualityCheckScreen: React.FC = () => {
   const { navigate, addScreening, setActiveReportRecord, userRole, patientProfile, account } = useApp();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+
+  // Patient detail entry modal/step states (specifically for worker flow: Camera -> Quality -> Patient Info)
+  const [showPatientForm, setShowPatientForm] = useState(false);
+  const [patientFullName, setPatientFullName] = useState(
+    userRole === 'patient' ? (patientProfile.fullName || account.fullName || '') : ''
+  );
+  const [patientAge, setPatientAge] = useState(
+    userRole === 'patient' ? (patientProfile.age || '') : ''
+  );
+  const [patientGender, setPatientGender] = useState<'Male' | 'Female' | 'Other'>('Male');
+  const [patientDiabetes, setPatientDiabetes] = useState<'Yes' | 'No' | 'Not sure'>('No');
 
   const handleExitToDashboard = () => {
     if (userRole === 'doctor') {
@@ -31,13 +46,31 @@ export const QualityCheckScreen: React.FC = () => {
     navigate('eyeCamera');
   };
 
-  const handleAnalyze = () => {
+  // Called when tapping "Analyze with AI"
+  const handleStartAnalysis = () => {
+    // If worker (or if patient full name is not set), ask worker to fill in patient details
+    if (userRole === 'worker' || !patientProfile.fullName) {
+      setShowPatientForm(true);
+    } else {
+      runAiAnalysis(patientProfile.fullName || account.fullName || 'Screening Patient', patientProfile.age || '—');
+    }
+  };
+
+  const handleSubmitPatientDetails = () => {
+    if (!patientFullName.trim()) {
+      Alert.alert('Required Field', 'Please enter the patient’s full name.');
+      return;
+    }
+    setShowPatientForm(false);
+    runAiAnalysis(patientFullName.trim(), patientAge.trim() || '—');
+  };
+
+  const runAiAnalysis = (targetName: string, targetAge: string) => {
     setIsAnalyzing(true);
     setTimeout(() => {
       setIsAnalyzing(false);
 
-      const patientName =
-        patientProfile.fullName || account.fullName || 'Screening Patient';
+      const patientName = targetName || 'Screening Patient';
 
       const initials =
         patientName
@@ -53,7 +86,7 @@ export const QualityCheckScreen: React.FC = () => {
         initials,
         name: patientName,
         date: 'Today',
-        age: patientProfile.age || '—',
+        age: targetAge || '—',
         condition: 'No DR (Mild Background)',
         status: 'NON-REFERABLE',
         drGrade: 'No DR (Mild Background)',
@@ -79,7 +112,7 @@ export const QualityCheckScreen: React.FC = () => {
       addScreening(newRecord);
       setActiveReportRecord(newRecord);
       setAnalysisComplete(true);
-    }, 1000);
+    }, 1200);
   };
 
   return (
@@ -196,7 +229,7 @@ export const QualityCheckScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.analyzeButton}
           activeOpacity={0.85}
-          onPress={handleAnalyze}
+          onPress={handleStartAnalysis}
           disabled={isAnalyzing}
         >
           {isAnalyzing ? (
@@ -206,6 +239,127 @@ export const QualityCheckScreen: React.FC = () => {
           )}
         </TouchableOpacity>
       </View>
+
+      {/* Patient Details Input Modal (Shown after Quality Check before AI Analysis) */}
+      {showPatientForm && (
+        <View style={styles.formModalOverlay}>
+          <TouchableOpacity
+            style={styles.formModalBackdrop}
+            activeOpacity={1}
+            onPress={() => setShowPatientForm(false)}
+          />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={styles.formModalKeyboardAvoid}
+          >
+            <View style={styles.formModalCard}>
+              <View style={styles.formModalHeader}>
+                <View>
+                  <Text style={styles.formModalBadge}>STEP 3 OF 3</Text>
+                  <Text style={styles.formModalTitle}>Patient Details</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.formModalClose}
+                  onPress={() => setShowPatientForm(false)}
+                >
+                  <Text style={styles.formModalCloseText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.formModalSubtitle}>
+                Fundus image passed quality check. Enter patient information to proceed with AI analysis.
+              </Text>
+
+              <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 380 }}>
+                {/* Patient Full Name */}
+                <Text style={styles.inputLabel}>PATIENT FULL NAME *</Text>
+                <TextInput
+                  style={styles.inputField}
+                  placeholder="e.g. Ramesh Kumar"
+                  placeholderTextColor={colors.textLight}
+                  value={patientFullName}
+                  onChangeText={setPatientFullName}
+                  autoCapitalize="words"
+                />
+
+                {/* Patient Age */}
+                <Text style={styles.inputLabel}>PATIENT AGE</Text>
+                <TextInput
+                  style={styles.inputField}
+                  placeholder="e.g. 52"
+                  placeholderTextColor={colors.textLight}
+                  keyboardType="numeric"
+                  maxLength={3}
+                  value={patientAge}
+                  onChangeText={setPatientAge}
+                />
+
+                {/* Gender / Sex */}
+                <Text style={styles.inputLabel}>GENDER</Text>
+                <View style={styles.genderRow}>
+                  {(['Male', 'Female', 'Other'] as const).map((gender) => {
+                    const isSelected = patientGender === gender;
+                    return (
+                      <TouchableOpacity
+                        key={gender}
+                        style={[
+                          styles.genderOption,
+                          isSelected && styles.genderOptionSelected,
+                        ]}
+                        onPress={() => setPatientGender(gender)}
+                      >
+                        <Text
+                          style={[
+                            styles.genderOptionText,
+                            isSelected && styles.genderOptionTextSelected,
+                          ]}
+                        >
+                          {gender}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                {/* Diabetes History */}
+                <Text style={styles.inputLabel}>KNOWN DIABETES HISTORY</Text>
+                <View style={styles.genderRow}>
+                  {(['Yes', 'No', 'Not sure'] as const).map((status) => {
+                    const isSelected = patientDiabetes === status;
+                    return (
+                      <TouchableOpacity
+                        key={status}
+                        style={[
+                          styles.genderOption,
+                          isSelected && styles.genderOptionSelected,
+                        ]}
+                        onPress={() => setPatientDiabetes(status)}
+                      >
+                        <Text
+                          style={[
+                            styles.genderOptionText,
+                            isSelected && styles.genderOptionTextSelected,
+                          ]}
+                        >
+                          {status}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                <TouchableOpacity
+                  style={styles.submitAnalysisBtn}
+                  activeOpacity={0.85}
+                  onPress={handleSubmitPatientDetails}
+                >
+                  <Text style={styles.submitAnalysisBtnText}>⚡ Run AI Analysis & Report</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      )}
 
       {/* Analysis Complete Modal */}
       {analysisComplete && (
@@ -586,5 +740,142 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 13,
     fontWeight: '600',
+  },
+  // Patient details modal styles
+  formModalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 9999,
+    justifyContent: 'flex-end',
+    elevation: 20,
+  },
+  formModalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  formModalKeyboardAvoid: {
+    width: '100%',
+  },
+  formModalCard: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 22,
+    paddingTop: 22,
+    paddingBottom: 36,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  formModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  formModalBadge: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    color: colors.primary,
+    marginBottom: 4,
+  },
+  formModalTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: colors.textPrimary,
+  },
+  formModalClose: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  formModalCloseText: {
+    fontSize: 16,
+    color: colors.textMuted,
+    fontWeight: '700',
+  },
+  formModalSubtitle: {
+    fontSize: 13,
+    color: colors.textMuted,
+    lineHeight: 18,
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: colors.textMuted,
+    letterSpacing: 0.8,
+    marginBottom: 6,
+    marginTop: 8,
+  },
+  inputField: {
+    backgroundColor: '#f8fafc',
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1.2,
+    borderColor: '#e2e8f0',
+    paddingHorizontal: 16,
+    fontSize: 14.5,
+    color: colors.textPrimary,
+  },
+  genderRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 4,
+  },
+  genderOption: {
+    flex: 1,
+    height: 42,
+    borderRadius: 12,
+    borderWidth: 1.2,
+    borderColor: '#e2e8f0',
+    backgroundColor: '#f8fafc',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  genderOptionSelected: {
+    backgroundColor: colors.primaryMuted,
+    borderColor: colors.primary,
+  },
+  genderOptionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  genderOptionTextSelected: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  submitAnalysisBtn: {
+    backgroundColor: colors.primary,
+    height: 52,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 18,
+    marginBottom: 10,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  submitAnalysisBtnText: {
+    color: '#ffffff',
+    fontWeight: '700',
+    fontSize: 15,
   },
 });
