@@ -126,7 +126,20 @@ export const DashboardScreen: React.FC = () => {
             <Text style={styles.toolEmoji}>📋</Text>
             <View style={styles.toolInfo}>
               <Text style={styles.toolTitle}>Screening History</Text>
-              <Text style={styles.toolSub}>View AI reports and fundus images</Text>
+              <Text style={styles.toolSub}>Track past scans and DR progression</Text>
+            </View>
+            <Text style={styles.toolChevron}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.toolItem}
+            activeOpacity={0.7}
+            onPress={() => navigate('reportScreen')}
+          >
+            <Text style={styles.toolEmoji}>📄</Text>
+            <View style={styles.toolInfo}>
+              <Text style={styles.toolTitle}>Latest Screening Report</Text>
+              <Text style={styles.toolSub}>AI diagnostic findings, evidence & doctors</Text>
             </View>
             <Text style={styles.toolChevron}>›</Text>
           </TouchableOpacity>

@@ -42,6 +42,12 @@ export interface WorkerProfile {
   organisation: string;
 }
 
+export interface EvidenceItem {
+  name: string;
+  level: 'High' | 'Moderate' | 'Low' | 'None';
+  color: 'red' | 'amber' | 'green' | 'gray';
+}
+
 export interface ScreeningRecord {
   id: string;
   initials: string;
@@ -50,6 +56,23 @@ export interface ScreeningRecord {
   age: number | string;
   condition: string;
   status: 'REFERABLE' | 'NON-REFERABLE';
+  // Clinical Report Fields
+  drGrade?: string;
+  aiConfidence?: number;
+  imageQuality?: 'Good' | 'Fair' | 'Unsatisfactory' | 'Poor';
+  imageQualityStatus?: 'done' | 'retake_needed' | 'verifying';
+  imageQualityMessage?: string;
+  evidence?: EvidenceItem[];
+  recommendation?: string;
+  recommendedDoctor?: {
+    name: string;
+    specialty: string;
+    hospital: string;
+    contact?: string;
+    timeframe: string;
+  };
+  gradCamAttention?: string;
+  capturedImageUri?: string;
 }
 
 export interface DoctorProfile {
@@ -76,4 +99,5 @@ export type ScreenType =
   | 'dashboard'
   | 'eyeCamera'
   | 'qualityCheck'
-  | 'screeningHistory';
+  | 'screeningHistory'
+  | 'reportScreen';

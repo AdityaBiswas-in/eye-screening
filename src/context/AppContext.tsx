@@ -21,7 +21,10 @@ interface AppContextType {
   workerProfile: WorkerProfile;
   doctorProfile: DoctorProfile;
   screenings: ScreeningRecord[];
+  activeReportRecord: ScreeningRecord | null;
   addScreening: (record: ScreeningRecord) => void;
+  setActiveReportRecord: (record: ScreeningRecord | null) => void;
+  viewReport: (record: ScreeningRecord) => void;
   setLanguage: (lang: SupportedLanguage) => void;
   setUserRole: (role: UserRole) => void;
   updateAccount: (updates: Partial<UserAccount>) => void;
@@ -46,6 +49,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     countryCode: '+91',
   });
   const [screenings, setScreenings] = useState<ScreeningRecord[]>([]);
+  const [activeReportRecord, setActiveReportRecord] = useState<ScreeningRecord | null>(null);
   const [patientProfile, setPatientProfile] = useState<PatientProfile>({
     fullName: '',
     phoneNumber: '',
@@ -111,6 +115,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setScreenings((prev) => [record, ...prev]);
   };
 
+  const viewReport = (record: ScreeningRecord) => {
+    setActiveReportRecord(record);
+    navigate('reportScreen');
+  };
+
   const signOut = () => {
     setAccount({ fullName: '', phoneNumber: '', countryCode: '+91' });
     setPatientProfile({ fullName: '', phoneNumber: '', age: '', sex: null, hasDiabetes: null });
@@ -123,6 +132,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       specialty: '',
       isVerified: false,
     });
+    setActiveReportRecord(null);
     setUserRole('patient');
     setScreenStack(['welcome']);
   };
@@ -141,7 +151,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         workerProfile,
         doctorProfile,
         screenings,
+        activeReportRecord,
         addScreening,
+        setActiveReportRecord,
+        viewReport,
         setLanguage,
         setUserRole,
         updateAccount,

@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
@@ -21,7 +20,7 @@ interface HistoryRecord {
 }
 
 export const ScreeningHistoryScreen: React.FC = () => {
-  const { goBack, canGoBack, navigate, patientProfile, account, screenings } = useApp();
+  const { goBack, canGoBack, navigate, patientProfile, account, screenings, viewReport } = useApp();
 
   // Dynamic patient header info from user profile/account
   const patientName =
@@ -53,8 +52,8 @@ export const ScreeningHistoryScreen: React.FC = () => {
     date: s.date || 'Today',
     condition: s.condition || 'No DR',
     status: s.status,
-    confidence: s.status === 'REFERABLE' ? 92 : 95,
-    quality: 'Good',
+    confidence: s.aiConfidence ?? (s.status === 'REFERABLE' ? 92 : 95),
+    quality: s.imageQuality || 'Good',
     color: s.status === 'REFERABLE' ? 'red' : 'green',
   }));
 
@@ -67,15 +66,19 @@ export const ScreeningHistoryScreen: React.FC = () => {
   };
 
   const handleShowDetails = (rec: HistoryRecord) => {
-    Alert.alert(
-      `${rec.condition} (${rec.status})`,
-      `Date: ${rec.date}\nAI Confidence: ${rec.confidence}%\nImage Quality: ${rec.quality}\n\nClinical Guidance:\n${
-        rec.status === 'REFERABLE'
-          ? 'Referral required to retina specialist within 30 days for comprehensive dilated fundus examination.'
-          : 'Annual routine retinal screening advised. Maintain healthy glycemic and blood pressure control.'
-      }`,
-      [{ text: 'Close' }]
-    );
+    // Find matching screening record or construct one
+    const matchingScreening = screenings.find((s) => s.id === rec.id) || {
+      id: rec.id,
+      initials,
+      name: patientName,
+      date: rec.date,
+      age: patientProfile.age || '—',
+      condition: rec.condition,
+      status: rec.status,
+      aiConfidence: rec.confidence,
+      imageQuality: rec.quality as any,
+    };
+    viewReport(matchingScreening);
   };
 
   return (

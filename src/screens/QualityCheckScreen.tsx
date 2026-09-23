@@ -13,7 +13,7 @@ import { colors } from '../theme/colors';
 import { ScreeningRecord } from '../types';
 
 export const QualityCheckScreen: React.FC = () => {
-  const { navigate, addScreening, userRole, patientProfile, account } = useApp();
+  const { navigate, addScreening, setActiveReportRecord, userRole, patientProfile, account } = useApp();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
 
@@ -56,9 +56,28 @@ export const QualityCheckScreen: React.FC = () => {
         age: patientProfile.age || '—',
         condition: 'No DR (Mild Background)',
         status: 'NON-REFERABLE',
+        drGrade: 'No DR (Mild Background)',
+        aiConfidence: 94,
+        imageQuality: 'Good',
+        imageQualityStatus: 'done',
+        recommendation:
+          'Routine annual dilated retinal screening advised. Maintain healthy glycemic and blood pressure parameters.',
+        evidence: [
+          { name: 'Microaneurysm-like regions', level: 'None', color: 'green' },
+          { name: 'Hemorrhage-like regions', level: 'None', color: 'green' },
+          { name: 'Hard exudate-like regions', level: 'Low', color: 'green' },
+        ],
+        recommendedDoctor: {
+          name: 'Dr. Sarah Jenkins, MD',
+          specialty: 'Retina Specialist & Vitreoretinal Surgeon',
+          hospital: 'Apex Eye Institute & Research Hospital',
+          contact: '+91 98765 43210',
+          timeframe: 'Annual routine screening (12 months)',
+        },
       };
 
       addScreening(newRecord);
+      setActiveReportRecord(newRecord);
       setAnalysisComplete(true);
     }, 1000);
   };
@@ -197,14 +216,14 @@ export const QualityCheckScreen: React.FC = () => {
             </View>
             <Text style={styles.modalTitle}>AI Analysis Complete</Text>
             <Text style={styles.modalSub}>
-              Image verified as Gradable (94%). Screening report recorded successfully.
+              Image verified as Gradable (94%). Clinical screening report and specialist guidance ready.
             </Text>
             <TouchableOpacity
               style={styles.modalPrimaryButton}
               activeOpacity={0.85}
-              onPress={handleExitToDashboard}
+              onPress={() => navigate('reportScreen')}
             >
-              <Text style={styles.modalPrimaryText}>Go to Dashboard ›</Text>
+              <Text style={styles.modalPrimaryText}>📄 View Full Report ›</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalSecondaryButton}
@@ -212,6 +231,13 @@ export const QualityCheckScreen: React.FC = () => {
               onPress={() => navigate('screeningHistory')}
             >
               <Text style={styles.modalSecondaryText}>View Screening History</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalTertiaryButton}
+              activeOpacity={0.7}
+              onPress={handleExitToDashboard}
+            >
+              <Text style={styles.modalTertiaryText}>Return to Dashboard</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -543,10 +569,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f5f9',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 8,
   },
   modalSecondaryText: {
     color: colors.textSecondary,
     fontSize: 14,
+    fontWeight: '600',
+  },
+  modalTertiaryButton: {
+    width: '100%',
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTertiaryText: {
+    color: colors.textMuted,
+    fontSize: 13,
     fontWeight: '600',
   },
 });

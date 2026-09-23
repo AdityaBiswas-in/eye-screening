@@ -17,6 +17,7 @@ import { DashboardScreen } from './src/screens/DashboardScreen';
 import { EyeCameraScreen } from './src/screens/EyeCameraScreen';
 import { QualityCheckScreen } from './src/screens/QualityCheckScreen';
 import { ScreeningHistoryScreen } from './src/screens/ScreeningHistoryScreen';
+import { ReportScreen } from './src/screens/ReportScreen';
 
 function AppNavigator() {
   const { currentScreen } = useApp();
@@ -53,6 +54,8 @@ function AppNavigator() {
         return <QualityCheckScreen />;
       case 'screeningHistory':
         return <ScreeningHistoryScreen />;
+      case 'reportScreen':
+        return <ReportScreen />;
       default:
         return <WelcomeScreen />;
     }
