@@ -19,6 +19,7 @@ export const DashboardScreen: React.FC = () => {
   const {
     account,
     patientProfile,
+    t,
     language,
     navigate,
     signOut,
@@ -75,7 +76,7 @@ export const DashboardScreen: React.FC = () => {
 
         {/* Top Bar Greeting */}
         <View style={styles.greetingBar}>
-          <Text style={styles.greeting}>Welcome back,</Text>
+          <Text style={styles.greeting}>{t.welcomeBack}</Text>
           <Text style={styles.userName}>{displayName}</Text>
         </View>
 
@@ -84,8 +85,8 @@ export const DashboardScreen: React.FC = () => {
           <View style={styles.cardHeader}>
             <RetinaLogo size={44} />
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.cardTitle}>Retinal Health Check</Text>
-              <Text style={styles.cardSub}>AI Diabetic Retinopathy Screening</Text>
+              <Text style={styles.cardTitle}>{t.retinalHealthCheck}</Text>
+              <Text style={styles.cardSub}>{t.diabeticRetinopathyScreening}</Text>
             </View>
           </View>
 
@@ -104,13 +105,13 @@ export const DashboardScreen: React.FC = () => {
               <Ionicons name="finger-print" size={20} color={colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.patientIdBannerLabel}>YOUR PATIENT ID</Text>
+              <Text style={styles.patientIdBannerLabel}>{t.patientId}</Text>
               <Text style={styles.patientIdBannerValue}>
                 {patientProfile.patientId || '—'}
               </Text>
               {!!patientProfile.patientId && (
                 <Text style={styles.patientIdCopyHint}>
-                  {idCopied ? 'Copied to clipboard' : 'Tap to copy'}
+                  {idCopied ? t.copiedToClipboard : t.tapToCopy}
                 </Text>
               )}
             </View>
@@ -119,7 +120,7 @@ export const DashboardScreen: React.FC = () => {
         </View>
 
         {/* Quick Features List */}
-        <Text style={styles.sectionHeader}>Screening Tools</Text>
+        <Text style={styles.sectionHeader}>{t.screeningTools}</Text>
 
         <View style={styles.toolsList}>
           <TouchableOpacity
@@ -131,8 +132,8 @@ export const DashboardScreen: React.FC = () => {
               <MaterialCommunityIcons name="clipboard-text-outline" size={22} color={colors.primary} />
             </View>
             <View style={styles.toolInfo}>
-              <Text style={styles.toolTitle}>Screening History</Text>
-              <Text style={styles.toolSub}>Track past scans and DR progression</Text>
+              <Text style={styles.toolTitle}>{t.screeningHistory}</Text>
+              <Text style={styles.toolSub}>{t.screeningHistoryDescription}</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
           </TouchableOpacity>
@@ -146,8 +147,8 @@ export const DashboardScreen: React.FC = () => {
               <Ionicons name="document-text-outline" size={22} color="#2563eb" />
             </View>
             <View style={styles.toolInfo}>
-              <Text style={styles.toolTitle}>Latest Screening Report</Text>
-              <Text style={styles.toolSub}>AI diagnostic findings, evidence & doctors</Text>
+              <Text style={styles.toolTitle}>{t.latestScreeningReport}</Text>
+              <Text style={styles.toolSub}>{t.latestScreeningReportDescription}</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
           </TouchableOpacity>
@@ -161,7 +162,7 @@ export const DashboardScreen: React.FC = () => {
               <Ionicons name="language-outline" size={22} color="#16a34a" />
             </View>
             <View style={styles.toolInfo}>
-              <Text style={styles.toolTitle}>Change Language</Text>
+              <Text style={styles.toolTitle}>{t.changeLanguage}</Text>
               <Text style={styles.toolSub}>
                 Currently set to {currentLang.nativeName} ({language.toUpperCase()})
               </Text>
@@ -177,7 +178,7 @@ export const DashboardScreen: React.FC = () => {
           onPress={handleSignOut}
         >
           <Ionicons name="log-out-outline" size={18} color="#ef4444" style={{ marginRight: 8 }} />
-          <Text style={styles.signOutButtonText}>Sign Out of RetinaCare</Text>
+          <Text style={styles.signOutButtonText}>{t.signOut}</Text>
         </TouchableOpacity>
       </ScrollView>
 

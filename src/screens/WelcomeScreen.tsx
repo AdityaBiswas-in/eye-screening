@@ -86,6 +86,13 @@ export const WelcomeScreen: React.FC = () => {
         >
           <Text style={styles.primaryButtonText}>{t.getStarted}</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.signInButton}
+          activeOpacity={0.75}
+          onPress={() => navigate('signIn')}
+        >
+          <Text style={styles.signInButtonText}>{t.signIn}</Text>
+        </TouchableOpacity>
       </View>
 
       {/* In-App Language Selection Modal */}
@@ -223,6 +230,16 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: '#ffffff',
     fontSize: 16,
+    fontWeight: '700',
+  },
+  signInButton: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  signInButtonText: {
+    color: colors.primary,
+    fontSize: 15,
     fontWeight: '700',
   },
 });

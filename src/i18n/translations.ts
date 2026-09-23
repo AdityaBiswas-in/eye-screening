@@ -50,6 +50,18 @@ export interface Translations {
   agePlaceholder: string;
   back: string;
   changeLanguage: string;
+  welcomeBack: string;
+  retinalHealthCheck: string;
+  diabeticRetinopathyScreening: string;
+  patientId: string;
+  copiedToClipboard: string;
+  tapToCopy: string;
+  screeningTools: string;
+  screeningHistory: string;
+  screeningHistoryDescription: string;
+  latestScreeningReport: string;
+  latestScreeningReportDescription: string;
+  signOut: string;
 }
 
 export const translations: Record<SupportedLanguage, Translations> = {
@@ -91,6 +103,18 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'e.g. 52',
     back: 'Back',
     changeLanguage: 'Language',
+    welcomeBack: 'Welcome back,',
+    retinalHealthCheck: 'Retinal Health Check',
+    diabeticRetinopathyScreening: 'AI Diabetic Retinopathy Screening',
+    patientId: 'YOUR PATIENT ID',
+    copiedToClipboard: 'Copied to clipboard',
+    tapToCopy: 'Tap to copy',
+    screeningTools: 'Screening Tools',
+    screeningHistory: 'Screening History',
+    screeningHistoryDescription: 'Track past scans and DR progression',
+    latestScreeningReport: 'Latest Screening Report',
+    latestScreeningReportDescription: 'AI diagnostic findings, evidence & doctors',
+    signOut: 'Sign Out of RetinaCare',
   },
   hi: {
     appName: 'रेटिनाकेयर',
@@ -130,6 +154,18 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'उदा. 52',
     back: 'पीछे',
     changeLanguage: 'भाषा',
+    welcomeBack: 'वापसी पर स्वागत है,',
+    retinalHealthCheck: 'रेटिना स्वास्थ्य जांच',
+    diabeticRetinopathyScreening: 'एआई डायबिटिक रेटिनोपैथी स्क्रीनिंग',
+    patientId: 'आपकी रोगी आईडी',
+    copiedToClipboard: 'क्लिपबोर्ड पर कॉपी किया गया',
+    tapToCopy: 'कॉपी करने के लिए टैप करें',
+    screeningTools: 'स्क्रीनिंग टूल',
+    screeningHistory: 'स्क्रीनिंग इतिहास',
+    screeningHistoryDescription: 'पिछली जांच और डीआर की प्रगति देखें',
+    latestScreeningReport: 'नवीनतम स्क्रीनिंग रिपोर्ट',
+    latestScreeningReportDescription: 'एआई निष्कर्ष, साक्ष्य और डॉक्टर',
+    signOut: 'रेटिनाकेयर से साइन आउट करें',
   },
   bn: {
     appName: 'রেটিনাকেয়ার',
@@ -169,6 +205,18 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'যেমন ৫২',
     back: 'পেছনে',
     changeLanguage: 'ভাষা',
+    welcomeBack: 'আবার স্বাগতম,',
+    retinalHealthCheck: 'রেটিনার স্বাস্থ্য পরীক্ষা',
+    diabeticRetinopathyScreening: 'এআই ডায়াবেটিক রেটিনোপ্যাথি স্ক্রিনিং',
+    patientId: 'আপনার রোগী আইডি',
+    copiedToClipboard: 'ক্লিপবোর্ডে কপি করা হয়েছে',
+    tapToCopy: 'কপি করতে ট্যাপ করুন',
+    screeningTools: 'স্ক্রিনিং টুল',
+    screeningHistory: 'স্ক্রিনিংয়ের ইতিহাস',
+    screeningHistoryDescription: 'আগের স্ক্যান এবং ডিআরের অগ্রগতি দেখুন',
+    latestScreeningReport: 'সর্বশেষ স্ক্রিনিং রিপোর্ট',
+    latestScreeningReportDescription: 'এআই ফলাফল, প্রমাণ ও ডাক্তার',
+    signOut: 'রেটিনাকেয়ার থেকে সাইন আউট করুন',
   },
   ta: {
     appName: 'ரெட்டினாகேர்',
@@ -208,6 +256,18 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'எ.கா. 52',
     back: 'பின்செல்',
     changeLanguage: 'மொழி',
+    welcomeBack: 'மீண்டும் வரவேற்கிறோம்,',
+    retinalHealthCheck: 'விழித்திரை சுகாதாரப் பரிசோதனை',
+    diabeticRetinopathyScreening: 'AI நீரிழிவு விழித்திரை நோய் பரிசோதனை',
+    patientId: 'உங்கள் நோயாளி அடையாள எண்',
+    copiedToClipboard: 'கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது',
+    tapToCopy: 'நகலெடுக்கத் தட்டவும்',
+    screeningTools: 'பரிசோதனைக் கருவிகள்',
+    screeningHistory: 'பரிசோதனை வரலாறு',
+    screeningHistoryDescription: 'முந்தைய ஸ்கேன்கள் மற்றும் DR முன்னேற்றத்தைக் கண்காணிக்கவும்',
+    latestScreeningReport: 'சமீபத்திய பரிசோதனை அறிக்கை',
+    latestScreeningReportDescription: 'AI கண்டறிதல்கள், ஆதாரங்கள் மற்றும் மருத்துவர்கள்',
+    signOut: 'ரெட்டினாகேரிலிருந்து வெளியேறவும்',
   },
   te: {
     appName: 'రెటినాకేర్',
@@ -247,6 +307,18 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'ఉదా. 52',
     back: 'వెనుకకు',
     changeLanguage: 'భాష',
+    welcomeBack: 'తిరిగి స్వాగతం,',
+    retinalHealthCheck: 'రెటీనా ఆరోగ్య పరీక్ష',
+    diabeticRetinopathyScreening: 'AI డయాబెటిక్ రెటినోపతి స్క్రీనింగ్',
+    patientId: 'మీ రోగి ID',
+    copiedToClipboard: 'క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది',
+    tapToCopy: 'కాపీ చేయడానికి నొక్కండి',
+    screeningTools: 'స్క్రీనింగ్ సాధనాలు',
+    screeningHistory: 'స్క్రీనింగ్ చరిత్ర',
+    screeningHistoryDescription: 'గత స్కాన్‌లు మరియు DR పురోగతిని ట్రాక్ చేయండి',
+    latestScreeningReport: 'తాజా స్క్రీనింగ్ నివేదిక',
+    latestScreeningReportDescription: 'AI నిర్ధారణలు, ఆధారాలు మరియు వైద్యులు',
+    signOut: 'రెటినాకేర్ నుండి సైన్ అవుట్ చేయండి',
   },
   mr: {
     appName: 'रेटिनाकेअर',
@@ -286,6 +358,18 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'उदा. ५२',
     back: 'मागे',
     changeLanguage: 'भाषा',
+    welcomeBack: 'पुन्हा स्वागत आहे,',
+    retinalHealthCheck: 'रेटिना आरोग्य तपासणी',
+    diabeticRetinopathyScreening: 'AI डायबेटिक रेटिनोपॅथी स्क्रीनिंग',
+    patientId: 'तुमचा रुग्ण आयडी',
+    copiedToClipboard: 'क्लिपबोर्डवर कॉपी केले',
+    tapToCopy: 'कॉपी करण्यासाठी टॅप करा',
+    screeningTools: 'स्क्रीनिंग साधने',
+    screeningHistory: 'स्क्रीनिंग इतिहास',
+    screeningHistoryDescription: 'मागील स्कॅन आणि DR प्रगतीचा मागोवा घ्या',
+    latestScreeningReport: 'नवीनतम स्क्रीनिंग अहवाल',
+    latestScreeningReportDescription: 'AI निष्कर्ष, पुरावे आणि डॉक्टर',
+    signOut: 'रेटिनाकेअरमधून साइन आउट करा',
   },
   kn: {
     appName: 'ರೆಟಿನಾಕೇರ್',
@@ -325,6 +409,18 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'ಉದಾ. 52',
     back: 'ಹಿಂದೆ',
     changeLanguage: 'ಭಾಷೆ',
+    welcomeBack: 'ಮರಳಿ ಸ್ವಾಗತ,',
+    retinalHealthCheck: 'ರೆಟಿನಾ ಆರೋಗ್ಯ ತಪಾಸಣೆ',
+    diabeticRetinopathyScreening: 'AI ಡಯಾಬಿಟಿಕ್ ರೆಟಿನೋಪತಿ ಸ್ಕ್ರೀನಿಂಗ್',
+    patientId: 'ನಿಮ್ಮ ರೋಗಿ ID',
+    copiedToClipboard: 'ಕ್ಲಿಪ್‌ಬೋರ್ಡ್‌ಗೆ ನಕಲಿಸಲಾಗಿದೆ',
+    tapToCopy: 'ನಕಲಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ',
+    screeningTools: 'ಸ್ಕ್ರೀನಿಂಗ್ ಸಾಧನಗಳು',
+    screeningHistory: 'ಸ್ಕ್ರೀನಿಂಗ್ ಇತಿಹಾಸ',
+    screeningHistoryDescription: 'ಹಿಂದಿನ ಸ್ಕ್ಯಾನ್‌ಗಳು ಮತ್ತು DR ಪ್ರಗತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ',
+    latestScreeningReport: 'ಇತ್ತೀಚಿನ ಸ್ಕ್ರೀನಿಂಗ್ ವರದಿ',
+    latestScreeningReportDescription: 'AI ಸಂಶೋಧನೆಗಳು, ಸಾಕ್ಷ್ಯಗಳು ಮತ್ತು ವೈದ್ಯರು',
+    signOut: 'ರೆಟಿನಾಕೇರ್‌ನಿಂದ ಸೈನ್ ಔಟ್ ಮಾಡಿ',
   },
   ml: {
     appName: 'റെറ്റിനാകെയർ',
@@ -364,6 +460,18 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'ഉദാ. 52',
     back: 'പിന്നോട്ട്',
     changeLanguage: 'ഭാഷ',
+    welcomeBack: 'വീണ്ടും സ്വാഗതം,',
+    retinalHealthCheck: 'റെറ്റിന ആരോഗ്യ പരിശോധന',
+    diabeticRetinopathyScreening: 'AI ഡയബറ്റിക് റെറ്റിനോപ്പതി പരിശോധന',
+    patientId: 'നിങ്ങളുടെ രോഗി ഐഡി',
+    copiedToClipboard: 'ക്ലിപ്പ്ബോർഡിലേക്ക് പകർത്തി',
+    tapToCopy: 'പകർത്താൻ ടാപ്പ് ചെയ്യുക',
+    screeningTools: 'പരിശോധനാ ഉപകരണങ്ങൾ',
+    screeningHistory: 'പരിശോധനാ ചരിത്രം',
+    screeningHistoryDescription: 'മുമ്പത്തെ സ്കാനുകളും DR പുരോഗതിയും ട്രാക്ക് ചെയ്യുക',
+    latestScreeningReport: 'ഏറ്റവും പുതിയ പരിശോധനാ റിപ്പോർട്ട്',
+    latestScreeningReportDescription: 'AI കണ്ടെത്തലുകൾ, തെളിവുകൾ, ഡോക്ടർമാർ',
+    signOut: 'റെറ്റിനാകെയറിൽ നിന്ന് സൈൻ ഔട്ട് ചെയ്യുക',
   },
   gu: {
     appName: 'રેટિનાકેર',
@@ -403,5 +511,17 @@ export const translations: Record<SupportedLanguage, Translations> = {
     agePlaceholder: 'દા.ત. 52',
     back: 'પાછા',
     changeLanguage: 'ભાષા',
+    welcomeBack: 'ફરી સ્વાગત છે,',
+    retinalHealthCheck: 'રેટિના આરોગ્ય તપાસ',
+    diabeticRetinopathyScreening: 'AI ડાયાબિટીક રેટિનોપેથી સ્ક્રીનિંગ',
+    patientId: 'તમારો દર્દી ID',
+    copiedToClipboard: 'ક્લિપબોર્ડ પર કૉપિ કર્યું',
+    tapToCopy: 'કૉપિ કરવા ટૅપ કરો',
+    screeningTools: 'સ્ક્રીનિંગ સાધનો',
+    screeningHistory: 'સ્ક્રીનિંગ ઇતિહાસ',
+    screeningHistoryDescription: 'અગાઉના સ્કેન અને DR પ્રગતિને ટ્રૅક કરો',
+    latestScreeningReport: 'નવીનતમ સ્ક્રીનિંગ રિપોર્ટ',
+    latestScreeningReportDescription: 'AI તારણો, પુરાવા અને ડૉક્ટર્સ',
+    signOut: 'રેટિનાકેરમાંથી સાઇન આઉટ કરો',
   },
 };

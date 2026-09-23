@@ -95,6 +95,8 @@ export interface DoctorProfile {
 
 export type ScreenType =
   | 'welcome'
+  | 'signIn'
+  | 'phoneVerification'
   | 'language'
   | 'register'
   | 'role'

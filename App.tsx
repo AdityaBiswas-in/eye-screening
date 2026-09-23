@@ -3,6 +3,8 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, SafeAreaView } from 'react-native';
 import { AppProvider, useApp } from './src/context/AppContext';
 import { WelcomeScreen } from './src/screens/WelcomeScreen';
+import { SignInScreen } from './src/screens/SignInScreen';
+import { PhoneVerificationScreen } from './src/screens/PhoneVerificationScreen';
 import { LanguageSelectScreen } from './src/screens/LanguageSelectScreen';
 import { CreateAccountScreen } from './src/screens/CreateAccountScreen';
 import { RoleSelectScreen } from './src/screens/RoleSelectScreen';
@@ -26,6 +28,10 @@ function AppNavigator() {
     switch (currentScreen) {
       case 'welcome':
         return <WelcomeScreen />;
+      case 'signIn':
+        return <SignInScreen />;
+      case 'phoneVerification':
+        return <PhoneVerificationScreen />;
       case 'language':
         return <LanguageSelectScreen />;
       case 'register':

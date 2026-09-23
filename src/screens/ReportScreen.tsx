@@ -222,14 +222,16 @@ export const ReportScreen: React.FC = () => {
           <Text style={styles.emptySub}>
             Take a retinal photo with the camera to generate your AI screening report, evidence maps, and specialist recommendation.
           </Text>
-          <TouchableOpacity
-            style={styles.emptyScanBtn}
-            activeOpacity={0.85}
-            onPress={() => navigate('eyeCamera')}
-          >
-            <Ionicons name="camera" size={18} color="#ffffff" style={{ marginRight: 8 }} />
-            <Text style={styles.emptyScanBtnText}>Start Retinal Scan</Text>
-          </TouchableOpacity>
+          {userRole !== 'patient' && (
+            <TouchableOpacity
+              style={styles.emptyScanBtn}
+              activeOpacity={0.85}
+              onPress={() => navigate('eyeCamera')}
+            >
+              <Ionicons name="camera" size={18} color="#ffffff" style={{ marginRight: 8 }} />
+              <Text style={styles.emptyScanBtnText}>Start Retinal Scan</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );

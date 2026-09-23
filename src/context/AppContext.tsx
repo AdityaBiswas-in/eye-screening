@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { Platform } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import {
   PatientProfile,
   ScreenType,
@@ -45,6 +47,14 @@ interface AppContextType {
   goBack: () => void;
   canGoBack: boolean;
   signOut: () => void;
+  savedAccountsForPhone: (phoneNumber: string) => Promise<SavedAccount[]>;
+  signInWithPhone: (phoneNumber: string, role: UserRole) => Promise<boolean>;
+  pendingSignInPhone: string;
+  setPendingSignInPhone: (phoneNumber: string) => void;
+  isPendingPhoneVerified: boolean;
+  setIsPendingPhoneVerified: (isVerified: boolean) => void;
+  verifiedSignInAccounts: SavedAccount[];
+  setVerifiedSignInAccounts: (accounts: SavedAccount[]) => void;
   // Captured image passed from EyeCameraScreen → QualityCheckScreen → API
   capturedImageUri: string | null;
   capturedImageFile: File | null;
@@ -52,6 +62,49 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+
+const SAVED_ACCOUNT_KEY = 'retinacare.saved-accounts.v2';
+const LEGACY_SAVED_ACCOUNT_KEY = 'retinacare.saved-account.v1';
+const LANGUAGE_KEY = 'retinacare.language.v1';
+
+export interface SavedAccount {
+  account: UserAccount;
+  userRole: UserRole;
+  patientProfile: PatientProfile;
+  workerProfile: WorkerProfile;
+  doctorProfile: DoctorProfile;
+}
+
+interface SavedAccountsStore {
+  accounts: SavedAccount[];
+}
+
+const saveLocally = async (value: string, key = SAVED_ACCOUNT_KEY) => {
+  if (Platform.OS === 'web') {
+    globalThis.localStorage?.setItem(key, value);
+    return;
+  }
+  await SecureStore.setItemAsync(key, value);
+};
+
+const readLocally = async (key = SAVED_ACCOUNT_KEY) => {
+  if (Platform.OS === 'web') return globalThis.localStorage?.getItem(key) ?? null;
+  return SecureStore.getItemAsync(key);
+};
+
+const readSavedAccounts = async (): Promise<SavedAccount[]> => {
+  const savedValue = await readLocally();
+  if (savedValue) {
+    const savedStore = JSON.parse(savedValue) as SavedAccountsStore;
+    return Array.isArray(savedStore.accounts) ? savedStore.accounts : [];
+  }
+
+  // Keep accounts created before multi-role sign-in available after the update.
+  const legacyValue = await readLocally(LEGACY_SAVED_ACCOUNT_KEY);
+  if (!legacyValue) return [];
+  const legacyAccount = JSON.parse(legacyValue) as SavedAccount;
+  return legacyAccount.account ? [legacyAccount] : [];
+};
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [screenStack, setScreenStack] = useState<ScreenType[]>(['welcome']);
@@ -66,6 +119,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [activeReportRecord, setActiveReportRecord] = useState<ScreeningRecord | null>(null);
   const [capturedImageUri, setCapturedImageUri] = useState<string | null>(null);
   const [capturedImageFile, setCapturedImageFile] = useState<File | null>(null);
+  const [pendingSignInPhone, setPendingSignInPhone] = useState('');
+  const [isPendingPhoneVerified, setIsPendingPhoneVerified] = useState(false);
+  const [verifiedSignInAccounts, setVerifiedSignInAccounts] = useState<SavedAccount[]>([]);
 
   const setCapturedImage = (uri: string | null, file: File | null = null) => {
     setCapturedImageUri(uri);
@@ -93,6 +149,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     specialty: '',
     isVerified: false,
   });
+  const [isRestoring, setIsRestoring] = useState(true);
 
   const currentScreen = screenStack[screenStack.length - 1];
   const canGoBack = screenStack.length > 1;
@@ -115,6 +172,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const setLanguage = (lang: SupportedLanguage) => {
     setLanguageState(lang);
+    saveLocally(JSON.stringify({ language: lang }), LANGUAGE_KEY).catch(() => {
+      // The selected language remains active for this session if storage is unavailable.
+    });
   };
 
   const updateAccount = (updates: Partial<UserAccount>) => {
@@ -163,6 +223,83 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setScreenStack(['welcome']);
   };
 
+  useEffect(() => {
+    const restoreStorage = async () => {
+      // Wait until local storage is checked before writing any new account data.
+      try {
+        const savedLanguage = await readLocally(LANGUAGE_KEY);
+        if (savedLanguage) {
+          const parsed = JSON.parse(savedLanguage) as { language?: SupportedLanguage };
+          if (parsed.language && parsed.language in translations) {
+            setLanguageState(parsed.language);
+          }
+        }
+      } catch {
+        // Use English when the stored language is unavailable or invalid.
+      }
+      setIsRestoring(false);
+    };
+    restoreStorage();
+  }, []);
+
+  useEffect(() => {
+    if (isRestoring || !account.fullName.trim() || !account.phoneNumber.trim()) return;
+
+    const savedAccount: SavedAccount = {
+      account,
+      userRole,
+      patientProfile,
+      workerProfile,
+      doctorProfile,
+    };
+    readSavedAccounts()
+      .then((accounts) => {
+        const accountIndex = accounts.findIndex(
+          (item) => item.account.phoneNumber === account.phoneNumber && item.userRole === userRole,
+        );
+        const updatedAccounts = [...accounts];
+        if (accountIndex >= 0) updatedAccounts[accountIndex] = savedAccount;
+        else updatedAccounts.push(savedAccount);
+        return saveLocally(JSON.stringify({ accounts: updatedAccounts } satisfies SavedAccountsStore));
+      })
+      .catch(() => {
+      // The account remains usable for this session if local storage is unavailable.
+      });
+  }, [account, doctorProfile, isRestoring, patientProfile, userRole, workerProfile]);
+
+  const savedAccountsForPhone = async (phoneNumber: string) => {
+    try {
+      const accounts = await readSavedAccounts();
+      return accounts.filter((item) => item.account.phoneNumber === phoneNumber.trim());
+    } catch {
+      return [];
+    }
+  };
+
+  const signInWithPhone = async (phoneNumber: string, role: UserRole) => {
+    try {
+      const accounts = await savedAccountsForPhone(phoneNumber);
+      const savedAccount = accounts.find((item) => item.userRole === role);
+      if (!savedAccount) return false;
+
+      setAccount(savedAccount.account);
+      setUserRole(savedAccount.userRole);
+      setPatientProfile(savedAccount.patientProfile);
+      setWorkerProfile(savedAccount.workerProfile);
+      setDoctorProfile(savedAccount.doctorProfile);
+      setScreenStack([
+        savedAccount.userRole === 'doctor'
+          ? 'doctorDashboard'
+          : savedAccount.userRole === 'worker'
+            ? 'workerDashboard'
+            : 'dashboard',
+      ]);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const t = translations[language] || translations.en;
 
   return (
@@ -191,6 +328,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         goBack,
         canGoBack,
         signOut,
+        savedAccountsForPhone,
+        signInWithPhone,
+        pendingSignInPhone,
+        setPendingSignInPhone,
+        isPendingPhoneVerified,
+        setIsPendingPhoneVerified,
+        verifiedSignInAccounts,
+        setVerifiedSignInAccounts,
         capturedImageUri,
         capturedImageFile,
         setCapturedImage,
