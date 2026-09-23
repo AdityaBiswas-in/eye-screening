@@ -82,14 +82,6 @@ export const DoctorDashboardScreen: React.FC = () => {
             >
               <Text style={styles.profileIcon}>👤</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.signOutButton}
-              activeOpacity={0.7}
-              onPress={handleSignOut}
-            >
-              <Text style={styles.signOutIcon}>🚪</Text>
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -266,10 +258,10 @@ export const DoctorDashboardScreen: React.FC = () => {
 
         <TouchableOpacity
           style={styles.navItem}
-          onPress={handleSignOut}
+          onPress={() => setShowProfileModal(true)}
         >
-          <Text style={styles.navIcon}>🚪</Text>
-          <Text style={styles.navLabel}>Sign Out</Text>
+          <Text style={styles.navIcon}>👤</Text>
+          <Text style={styles.navLabel}>Profile</Text>
         </TouchableOpacity>
       </View>
 

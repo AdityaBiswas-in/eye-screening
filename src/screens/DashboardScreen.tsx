@@ -63,14 +63,6 @@ export const DashboardScreen: React.FC = () => {
             >
               <Text style={styles.profileIconText}>👤</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.signOutIconButton}
-              activeOpacity={0.7}
-              onPress={handleSignOut}
-            >
-              <Text style={styles.signOutIconText}>🚪</Text>
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -231,19 +223,6 @@ const styles = StyleSheet.create({
   profileIconText: {
     fontSize: 16,
   },
-  signOutIconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  signOutIconText: {
-    fontSize: 16,
-  },
   greeting: {
     fontSize: 14,
     color: colors.textMuted,
@@ -253,17 +232,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '800',
     color: colors.textPrimary,
-  },
-  roleBadge: {
-    backgroundColor: colors.primaryMuted,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  roleBadgeText: {
-    color: colors.primary,
-    fontWeight: '700',
-    fontSize: 12,
   },
   signOutButton: {
     paddingVertical: 14,

@@ -115,14 +115,6 @@ export const WorkerDashboardScreen: React.FC = () => {
             >
               <Text style={styles.bellIcon}>🔔</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.signOutIconButton}
-              activeOpacity={0.7}
-              onPress={handleSignOut}
-            >
-              <Text style={styles.signOutIcon}>🚪</Text>
-            </TouchableOpacity>
           </View>
         </View>
 
