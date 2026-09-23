@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
@@ -16,6 +15,17 @@ import { ScreeningRecord } from '../types';
 export const QualityCheckScreen: React.FC = () => {
   const { navigate, addScreening, userRole, patientProfile, account } = useApp();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
+
+  const handleExitToDashboard = () => {
+    if (userRole === 'doctor') {
+      navigate('doctorDashboard');
+    } else if (userRole === 'worker') {
+      navigate('workerDashboard');
+    } else {
+      navigate('dashboard');
+    }
+  };
 
   const handleRetake = () => {
     navigate('eyeCamera');
@@ -29,13 +39,14 @@ export const QualityCheckScreen: React.FC = () => {
       const patientName =
         patientProfile.fullName || account.fullName || 'Screening Patient';
 
-      const initials = patientName
-        .trim()
-        .split(' ')
-        .map((p) => p[0])
-        .join('')
-        .substring(0, 2)
-        .toUpperCase() || 'SP';
+      const initials =
+        patientName
+          .trim()
+          .split(' ')
+          .map((p) => p[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase() || 'SP';
 
       const newRecord: ScreeningRecord = {
         id: Date.now().toString(),
@@ -48,26 +59,8 @@ export const QualityCheckScreen: React.FC = () => {
       };
 
       addScreening(newRecord);
-
-      Alert.alert(
-        'AI Analysis Complete',
-        'Image quality verified as Gradable (94%). Retinal screening report generated successfully.',
-        [
-          {
-            text: 'View Dashboard',
-            onPress: () => {
-              if (userRole === 'doctor') {
-                navigate('doctorDashboard');
-              } else if (userRole === 'worker') {
-                navigate('workerDashboard');
-              } else {
-                navigate('dashboard');
-              }
-            },
-          },
-        ]
-      );
-    }, 1200);
+      setAnalysisComplete(true);
+    }, 1000);
   };
 
   return (
@@ -82,17 +75,29 @@ export const QualityCheckScreen: React.FC = () => {
             style={styles.backButton}
             activeOpacity={0.7}
             onPress={handleRetake}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
 
           <View style={styles.headerTitleContainer}>
-            <Text style={styles.title}>Image Quality Check</Text>
+            <Text style={styles.title}>Image Quality</Text>
           </View>
 
-          <View style={styles.offlineBadge}>
-            <View style={styles.offlineDot} />
-            <Text style={styles.offlineText}>OFFLINE MODE</Text>
+          <View style={styles.topRightRow}>
+            <View style={styles.offlineBadge}>
+              <View style={styles.offlineDot} />
+              <Text style={styles.offlineText}>OFFLINE</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.exitButton}
+              activeOpacity={0.7}
+              onPress={handleExitToDashboard}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <Text style={styles.exitIcon}>✕</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -166,7 +171,7 @@ export const QualityCheckScreen: React.FC = () => {
           onPress={handleRetake}
           disabled={isAnalyzing}
         >
-          <Text style={styles.retakeText}>Retake Photo</Text>
+          <Text style={styles.retakeText}>Retake</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -182,6 +187,35 @@ export const QualityCheckScreen: React.FC = () => {
           )}
         </TouchableOpacity>
       </View>
+
+      {/* Analysis Complete Modal */}
+      {analysisComplete && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalCheckCircle}>
+              <Text style={styles.modalCheckIcon}>✓</Text>
+            </View>
+            <Text style={styles.modalTitle}>AI Analysis Complete</Text>
+            <Text style={styles.modalSub}>
+              Image verified as Gradable (94%). Screening report recorded successfully.
+            </Text>
+            <TouchableOpacity
+              style={styles.modalPrimaryButton}
+              activeOpacity={0.85}
+              onPress={handleExitToDashboard}
+            >
+              <Text style={styles.modalPrimaryText}>Go to Dashboard ›</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalSecondaryButton}
+              activeOpacity={0.7}
+              onPress={() => navigate('screeningHistory')}
+            >
+              <Text style={styles.modalSecondaryText}>View Screening History</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -203,15 +237,15 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: '#e6f4f5',
     alignItems: 'center',
     justifyContent: 'center',
   },
   backIcon: {
-    fontSize: 18,
+    fontSize: 20,
     color: colors.primary,
     fontWeight: '700',
   },
@@ -220,16 +254,21 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   title: {
-    fontSize: 19,
+    fontSize: 18,
     fontWeight: '800',
     color: colors.textPrimary,
+  },
+  topRightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   offlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ecfdf5',
-    paddingHorizontal: 9,
-    paddingVertical: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#a7f3d0',
@@ -239,13 +278,28 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     backgroundColor: '#10b981',
-    marginRight: 5,
+    marginRight: 4,
   },
   offlineText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '800',
     color: '#065f46',
     letterSpacing: 0.5,
+  },
+  exitButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#fee2e2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#fecaca',
+  },
+  exitIcon: {
+    color: '#dc2626',
+    fontSize: 14,
+    fontWeight: '800',
   },
   subtitle: {
     fontSize: 13,
@@ -414,5 +468,85 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 15,
     fontWeight: '700',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    zIndex: 9999,
+  },
+  modalCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 340,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalCheckCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#d1fae5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  modalCheckIcon: {
+    fontSize: 28,
+    color: '#059669',
+    fontWeight: '800',
+  },
+  modalTitle: {
+    fontSize: 19,
+    fontWeight: '800',
+    color: colors.textPrimary,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSub: {
+    fontSize: 13.5,
+    color: colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  modalPrimaryButton: {
+    width: '100%',
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  modalPrimaryText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  modalSecondaryButton: {
+    width: '100%',
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalSecondaryText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
