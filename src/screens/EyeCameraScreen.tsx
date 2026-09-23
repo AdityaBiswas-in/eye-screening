@@ -12,6 +12,21 @@ import { useApp } from '../context/AppContext';
 export const EyeCameraScreen: React.FC = () => {
   const { navigate, goBack, canGoBack, userRole } = useApp();
   const [isCapturing, setIsCapturing] = useState(false);
+  const [goodLighting, setGoodLighting] = useState(true);
+  const [retinaDetected, setRetinaDetected] = useState(true);
+  const [isSteady, setIsSteady] = useState(false);
+
+  // Simulate realistic camera viewfinder alignment stabilization
+  React.useEffect(() => {
+    // Stage 1: Lighting and retina detected immediately
+    const t1 = setTimeout(() => {
+      setIsSteady(true);
+    }, 1800);
+
+    return () => {
+      clearTimeout(t1);
+    };
+  }, []);
 
   const handleCapture = () => {
     setIsCapturing(true);
@@ -22,7 +37,6 @@ export const EyeCameraScreen: React.FC = () => {
   };
 
   const handleUploadImage = () => {
-    // In web/mobile environment, open file selector or simulate photo selection
     if (typeof document !== 'undefined') {
       const input = document.createElement('input');
       input.type = 'file';
@@ -120,28 +134,58 @@ export const EyeCameraScreen: React.FC = () => {
         {/* Real-time Checklist */}
         <View style={styles.checklistContainer}>
           {/* Check 1: Good lighting */}
-          <View style={styles.checkItem}>
-            <View style={styles.checkBadgeGreen}>
-              <Text style={styles.checkBadgeIcon}>✓</Text>
+          <TouchableOpacity
+            style={styles.checkItem}
+            activeOpacity={0.7}
+            onPress={() => setGoodLighting((p) => !p)}
+          >
+            <View style={goodLighting ? styles.checkBadgeGreen : styles.checkBadgeGray}>
+              {goodLighting ? (
+                <Text style={styles.checkBadgeIcon}>✓</Text>
+              ) : (
+                <View style={styles.checkDotInner} />
+              )}
             </View>
-            <Text style={styles.checkItemText}>Good lighting</Text>
-          </View>
+            <Text style={goodLighting ? styles.checkItemText : styles.checkItemTextMuted}>
+              Good lighting
+            </Text>
+          </TouchableOpacity>
 
           {/* Check 2: Retina detected */}
-          <View style={styles.checkItem}>
-            <View style={styles.checkBadgeGreen}>
-              <Text style={styles.checkBadgeIcon}>✓</Text>
+          <TouchableOpacity
+            style={styles.checkItem}
+            activeOpacity={0.7}
+            onPress={() => setRetinaDetected((p) => !p)}
+          >
+            <View style={retinaDetected ? styles.checkBadgeGreen : styles.checkBadgeGray}>
+              {retinaDetected ? (
+                <Text style={styles.checkBadgeIcon}>✓</Text>
+              ) : (
+                <View style={styles.checkDotInner} />
+              )}
             </View>
-            <Text style={styles.checkItemText}>Retina detected</Text>
-          </View>
+            <Text style={retinaDetected ? styles.checkItemText : styles.checkItemTextMuted}>
+              Retina detected
+            </Text>
+          </TouchableOpacity>
 
           {/* Check 3: Hold steady */}
-          <View style={styles.checkItem}>
-            <View style={styles.checkBadgeGray}>
-              <View style={styles.checkDotInner} />
+          <TouchableOpacity
+            style={styles.checkItem}
+            activeOpacity={0.7}
+            onPress={() => setIsSteady((p) => !p)}
+          >
+            <View style={isSteady ? styles.checkBadgeGreen : styles.checkBadgeGray}>
+              {isSteady ? (
+                <Text style={styles.checkBadgeIcon}>✓</Text>
+              ) : (
+                <View style={styles.checkDotInner} />
+              )}
             </View>
-            <Text style={styles.checkItemTextMuted}>Hold steady</Text>
-          </View>
+            <Text style={isSteady ? styles.checkItemText : styles.checkItemTextMuted}>
+              {isSteady ? 'Steady position locked' : 'Hold steady'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
