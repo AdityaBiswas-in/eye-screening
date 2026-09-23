@@ -30,7 +30,7 @@ export const QualityCheckScreen: React.FC = () => {
     userRole === 'patient' ? (patientProfile.age || '') : ''
   );
   const [patientGender, setPatientGender] = useState<'Male' | 'Female' | 'Other'>('Male');
-  const [patientDiabetes, setPatientDiabetes] = useState<'Yes' | 'No' | 'Not sure'>('No');
+  const [patientDiabetes, setPatientDiabetes] = useState<'Yes' | 'Not sure'>('Not sure');
 
   const handleExitToDashboard = () => {
     if (userRole === 'doctor') {
@@ -352,7 +352,7 @@ export const QualityCheckScreen: React.FC = () => {
                 {/* Diabetes History */}
                 <Text style={styles.inputLabel}>KNOWN DIABETES HISTORY</Text>
                 <View style={styles.genderRow}>
-                  {(['Yes', 'No', 'Not sure'] as const).map((status) => {
+                  {(['Yes', 'Not sure'] as const).map((status) => {
                     const isSelected = patientDiabetes === status;
                     return (
                       <TouchableOpacity
