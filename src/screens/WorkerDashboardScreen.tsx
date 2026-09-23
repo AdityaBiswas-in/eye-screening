@@ -19,7 +19,6 @@ import { LANGUAGES } from '../i18n/translations';
 
 export const WorkerDashboardScreen: React.FC = () => {
   const { navigate, screenings, addScreening, signOut, language } = useApp();
-  const [activeTab, setActiveTab] = useState<'home' | 'patients' | 'scan' | 'reports' | 'profile'>('home');
   const [showScanModal, setShowScanModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -376,73 +375,6 @@ export const WorkerDashboardScreen: React.FC = () => {
       </View>
     )}
 
-      {/* Bottom Floating Navigation Bar */}
-      <View style={styles.bottomNav}>
-        {/* Home */}
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => setActiveTab('home')}
-        >
-          <Text style={[styles.navIcon, activeTab === 'home' && styles.navIconActive]}>
-            🏠
-          </Text>
-          <Text style={[styles.navLabel, activeTab === 'home' && styles.navLabelActive]}>
-            Home
-          </Text>
-        </TouchableOpacity>
-
-        {/* Patients */}
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => setActiveTab('patients')}
-        >
-          <Text style={[styles.navIcon, activeTab === 'patients' && styles.navIconActive]}>
-            👥
-          </Text>
-          <Text style={[styles.navLabel, activeTab === 'patients' && styles.navLabelActive]}>
-            Patients
-          </Text>
-        </TouchableOpacity>
-
-        {/* Central Scan Button */}
-        <TouchableOpacity
-          style={styles.centerScanItem}
-          activeOpacity={0.85}
-          onPress={() => navigate('eyeCamera')}
-        >
-          <View style={styles.scanPillButton}>
-            <Text style={styles.scanPillIcon}>🎯</Text>
-          </View>
-          <Text style={styles.scanLabel}>Scan</Text>
-        </TouchableOpacity>
-
-        {/* Reports */}
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => setActiveTab('reports')}
-        >
-          <Text style={[styles.navIcon, activeTab === 'reports' && styles.navIconActive]}>
-            📄
-          </Text>
-          <Text style={[styles.navLabel, activeTab === 'reports' && styles.navLabelActive]}>
-            Reports
-          </Text>
-        </TouchableOpacity>
-
-        {/* Profile */}
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => setShowProfileModal(true)}
-        >
-          <Text style={[styles.navIcon, activeTab === 'profile' && styles.navIconActive]}>
-            👤
-          </Text>
-          <Text style={[styles.navLabel, activeTab === 'profile' && styles.navLabelActive]}>
-            Profile
-          </Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Language Selection Modal */}
       <LanguageModal
         visible={showLanguageModal}
@@ -466,7 +398,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 22,
     paddingTop: 52,
-    paddingBottom: 90,
+    paddingBottom: 36,
   },
   topHeader: {
     flexDirection: 'row',

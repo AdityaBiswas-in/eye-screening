@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
@@ -233,37 +232,7 @@ export const DoctorDashboardScreen: React.FC = () => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Doctor Bottom Navigation Bar */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={[styles.navIcon, styles.navActive]}>🏠</Text>
-          <Text style={[styles.navLabel, styles.navLabelActive]}>Dashboard</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigate('doctorQueue')}
-        >
-          <Text style={styles.navIcon}>📋</Text>
-          <Text style={styles.navLabel}>Queue</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => Alert.alert('Clinical Evidence', 'AI feature maps & Grad-CAM visual evidence.')}
-        >
-          <Text style={styles.navIcon}>🔍</Text>
-          <Text style={styles.navLabel}>Evidence</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => setShowProfileModal(true)}
-        >
-          <Text style={styles.navIcon}>👤</Text>
-          <Text style={styles.navLabel}>Profile</Text>
-        </TouchableOpacity>
-      </View>
 
       {/* Language Selection Modal */}
       <LanguageModal
@@ -288,7 +257,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 22,
     paddingTop: 52,
-    paddingBottom: 90,
+    paddingBottom: 36,
   },
   topHeader: {
     flexDirection: 'row',
