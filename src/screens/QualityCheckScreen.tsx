@@ -235,7 +235,7 @@ export const QualityCheckScreen: React.FC = () => {
           {isAnalyzing ? (
             <ActivityIndicator color="#ffffff" size="small" />
           ) : (
-            <Text style={styles.analyzeText}>Analyze with AI</Text>
+            <Text style={styles.analyzeText}>Analyse</Text>
           )}
         </TouchableOpacity>
       </View>
