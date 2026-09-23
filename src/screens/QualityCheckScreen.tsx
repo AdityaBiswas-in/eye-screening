@@ -12,6 +12,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { ScreeningRecord } from '../types';
@@ -176,7 +177,7 @@ export const QualityCheckScreen: React.FC = () => {
               onPress={handleExitToDashboard}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Text style={styles.exitIcon}>✕</Text>
+              <Ionicons name="close" size={20} color="#64748b" />
             </TouchableOpacity>
           </View>
         </View>
@@ -195,7 +196,7 @@ export const QualityCheckScreen: React.FC = () => {
         {/* Gradable Image Banner */}
         <View style={styles.assessmentBanner}>
           <View style={styles.checkCircle}>
-            <Text style={styles.checkIcon}>✓</Text>
+            <Ionicons name="checkmark" size={16} color="#ffffff" />
           </View>
           <View style={styles.bannerTextContainer}>
             <Text style={styles.bannerTitle}>GRADABLE IMAGE</Text>
@@ -284,7 +285,7 @@ export const QualityCheckScreen: React.FC = () => {
                   style={styles.formModalClose}
                   onPress={() => setShowPatientForm(false)}
                 >
-                  <Text style={styles.formModalCloseText}>✕</Text>
+                  <Ionicons name="close" size={20} color="#64748b" />
                 </TouchableOpacity>
               </View>
 
@@ -399,7 +400,7 @@ export const QualityCheckScreen: React.FC = () => {
           <View style={styles.analyzingCenterContent}>
             <View style={styles.reticleBadgeOuter}>
               <View style={styles.reticleBadgeInner}>
-                <Text style={styles.reticleIcon}>🎯</Text>
+                <MaterialCommunityIcons name="target" size={28} color={colors.primary} />
               </View>
             </View>
 
@@ -416,7 +417,7 @@ export const QualityCheckScreen: React.FC = () => {
                     analysisStep >= 1 ? styles.stepCheckCircleActive : styles.stepCheckCircleInactive,
                   ]}
                 >
-                  <Text style={styles.stepCheckIcon}>✓</Text>
+                  <Ionicons name="checkmark" size={13} color="#ffffff" />
                 </View>
                 <Text
                   style={[
@@ -426,7 +427,7 @@ export const QualityCheckScreen: React.FC = () => {
                 >
                   Checking image
                 </Text>
-                {analysisStep >= 1 && <Text style={styles.stepStatusTick}>✓</Text>}
+                {analysisStep >= 1 && <Ionicons name="checkmark-circle" size={16} color="#059669" />}
               </View>
 
               {/* Step 2: Analyzing retina */}
@@ -437,7 +438,7 @@ export const QualityCheckScreen: React.FC = () => {
                     analysisStep >= 2 ? styles.stepCheckCircleActive : styles.stepCheckCircleInactive,
                   ]}
                 >
-                  <Text style={styles.stepCheckIcon}>✓</Text>
+                  <Ionicons name="checkmark" size={13} color="#ffffff" />
                 </View>
                 <Text
                   style={[
@@ -447,7 +448,7 @@ export const QualityCheckScreen: React.FC = () => {
                 >
                   Analyzing retina
                 </Text>
-                {analysisStep >= 2 && <Text style={styles.stepStatusTick}>✓</Text>}
+                {analysisStep >= 2 && <Ionicons name="checkmark-circle" size={16} color="#059669" />}
               </View>
 
               {/* Step 3: Looking for signs of diabetic retinopathy */}
@@ -458,7 +459,7 @@ export const QualityCheckScreen: React.FC = () => {
                     analysisStep >= 3 ? styles.stepCheckCircleActive : styles.stepCheckCircleInactive,
                   ]}
                 >
-                  <Text style={styles.stepCheckIcon}>✓</Text>
+                  <Ionicons name="checkmark" size={13} color="#ffffff" />
                 </View>
                 <Text
                   style={[
@@ -468,7 +469,7 @@ export const QualityCheckScreen: React.FC = () => {
                 >
                   Looking for signs of diabetic{'\n'}retinopathy
                 </Text>
-                {analysisStep >= 3 && <Text style={styles.stepStatusTick}>✓</Text>}
+                {analysisStep >= 3 && <Ionicons name="checkmark-circle" size={16} color="#059669" />}
               </View>
 
               {/* Step 4: Preparing result */}
@@ -479,7 +480,7 @@ export const QualityCheckScreen: React.FC = () => {
                     analysisStep >= 4 ? styles.stepCheckCircleActive : styles.stepCheckCircleInactive,
                   ]}
                 >
-                  <Text style={styles.stepCheckIcon}>✓</Text>
+                  <Ionicons name="checkmark" size={13} color="#ffffff" />
                 </View>
                 <Text
                   style={[
@@ -494,7 +495,7 @@ export const QualityCheckScreen: React.FC = () => {
                   Preparing result
                 </Text>
                 {analysisStep >= 4 ? (
-                  <Text style={styles.stepStatusTick}>✓</Text>
+                  <Ionicons name="checkmark-circle" size={16} color="#059669" />
                 ) : analysisStep === 3 ? (
                   <Text style={styles.stepStatusProgress}>...</Text>
                 ) : null}
@@ -518,7 +519,7 @@ export const QualityCheckScreen: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <View style={styles.modalCheckCircle}>
-              <Text style={styles.modalCheckIcon}>✓</Text>
+              <Ionicons name="checkmark-sharp" size={36} color="#10b981" />
             </View>
             <Text style={styles.modalTitle}>AI Analysis Complete</Text>
             <Text style={styles.modalSub}>
@@ -529,7 +530,9 @@ export const QualityCheckScreen: React.FC = () => {
               activeOpacity={0.85}
               onPress={() => navigate('reportScreen')}
             >
-              <Text style={styles.modalPrimaryText}>📄 View Full Report ›</Text>
+              <Ionicons name="document-text-outline" size={18} color="#ffffff" style={{ marginRight: 6 }} />
+              <Text style={styles.modalPrimaryText}>View Full Report</Text>
+              <Ionicons name="chevron-forward" size={16} color="#ffffff" style={{ marginLeft: 4 }} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalSecondaryButton}

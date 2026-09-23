@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { ProfileModal } from '../components/ProfileModal';
@@ -93,7 +94,7 @@ export const ScreeningHistoryScreen: React.FC = () => {
             activeOpacity={0.7}
             onPress={handleBack}
           >
-            <Text style={styles.backIcon}>‹</Text>
+            <Ionicons name="arrow-back" size={20} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Screening history</Text>
         </View>
@@ -103,7 +104,7 @@ export const ScreeningHistoryScreen: React.FC = () => {
           activeOpacity={0.7}
           onPress={() => setShowProfileModal(true)}
         >
-          <Text style={styles.profileIconText}>👤</Text>
+          <Ionicons name="person-circle-outline" size={24} color="#0284c7" />
         </TouchableOpacity>
       </View>
 
@@ -127,7 +128,7 @@ export const ScreeningHistoryScreen: React.FC = () => {
         {allRecords.length === 0 ? (
           <View style={styles.emptyCard}>
             <View style={styles.emptyIconCircle}>
-              <Text style={styles.emptyIconText}>📋</Text>
+              <MaterialCommunityIcons name="clipboard-text-outline" size={30} color="#94a3b8" />
             </View>
             <Text style={styles.emptyTitle}>No screening records yet</Text>
             <Text style={styles.emptySubtitle}>
@@ -138,7 +139,8 @@ export const ScreeningHistoryScreen: React.FC = () => {
               activeOpacity={0.85}
               onPress={() => navigate('eyeCamera')}
             >
-              <Text style={styles.emptyActionBtnText}>📸 Start Retinal Scan</Text>
+              <Ionicons name="camera-outline" size={17} color="#ffffff" style={{ marginRight: 6 }} />
+              <Text style={styles.emptyActionBtnText}>Start Retinal Scan</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -407,6 +409,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,

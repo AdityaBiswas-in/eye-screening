@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 
@@ -17,7 +18,7 @@ export const DoctorPendingScreen: React.FC = () => {
         {/* Soft Green Checkmark Badge */}
         <View style={styles.checkCircleWrapper}>
           <View style={styles.checkCircle}>
-            <Text style={styles.checkMarkIcon}>✓</Text>
+            <Ionicons name="checkmark-sharp" size={48} color="#10b981" />
           </View>
         </View>
 

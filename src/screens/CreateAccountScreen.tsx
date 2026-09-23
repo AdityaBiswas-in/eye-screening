@@ -13,6 +13,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 
+import { RetinaAppBrand } from '../components/RetinaLogo';
+
 export const CreateAccountScreen: React.FC = () => {
   const { t, account, updateAccount, navigate, goBack, canGoBack } = useApp();
   const [name, setName] = useState(account.fullName);
@@ -38,13 +40,15 @@ export const CreateAccountScreen: React.FC = () => {
         >
           {/* Header */}
           <View style={styles.header}>
-            {canGoBack && (
-              <TouchableOpacity onPress={goBack} style={styles.backButton}>
-                <Ionicons name="arrow-back" size={20} color={colors.textPrimary} />
-                <Text style={styles.backButtonText}>{t.back}</Text>
-              </TouchableOpacity>
-            )}
-            <Text style={styles.brandTag}>{t.appName}</Text>
+            <View style={styles.topNavRow}>
+              {canGoBack && (
+                <TouchableOpacity onPress={goBack} style={styles.backButton}>
+                  <Ionicons name="arrow-back" size={20} color={colors.textPrimary} />
+                  <Text style={styles.backButtonText}>{t.back}</Text>
+                </TouchableOpacity>
+              )}
+              <RetinaAppBrand size={26} />
+            </View>
             <Text style={styles.title}>{t.createAccount}</Text>
           </View>
 
@@ -126,9 +130,16 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 32,
   },
+  topNavRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingVertical: 4,
   },
   backButtonText: {

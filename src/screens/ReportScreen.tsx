@@ -9,6 +9,7 @@ import {
   Alert,
   Modal,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { ScreeningRecord } from '../types';
@@ -20,7 +21,8 @@ export interface ViewModalityConfig {
   id: ModalityType;
   tabLabel: string;
   name: string;
-  icon: string;
+  iconFamily: 'ionicons' | 'material' | 'fontawesome';
+  iconName: string;
   badge: string;
   description: string;
   clinicalSign: string;
@@ -32,7 +34,8 @@ export const VIEW_MODALITIES: ViewModalityConfig[] = [
     id: 'original',
     tabLabel: 'Original',
     name: 'Natural Fundus (RGB)',
-    icon: '👁️',
+    iconFamily: 'ionicons',
+    iconName: 'eye-outline',
     badge: 'True Color Standard',
     description: 'High-definition color retinal photograph under balanced illumination.',
     clinicalSign: 'Optic disc margins, physiological cup, and macula pigmentation.',
@@ -42,7 +45,8 @@ export const VIEW_MODALITIES: ViewModalityConfig[] = [
     id: 'gradcam',
     tabLabel: 'Grad-CAM++',
     name: 'AI Lesion Attention Map',
-    icon: '🎯',
+    iconFamily: 'material',
+    iconName: 'target',
     badge: 'Neural Network Saliency',
     description: 'Grad-CAM++ saliency highlighting the exact pixels the AI used to determine DR grade.',
     clinicalSign: 'Neural activation focused on microaneurysms and intraretinal hemorrhage clusters.',
@@ -52,7 +56,8 @@ export const VIEW_MODALITIES: ViewModalityConfig[] = [
     id: 'thermal',
     tabLabel: 'Thermal / Heat',
     name: 'Metabolic Thermal Heatmap',
-    icon: '🔥',
+    iconFamily: 'material',
+    iconName: 'fire',
     badge: 'Intensity Spectrum',
     description: 'False-color thermal intensity gradient isolating local metabolic & vascular hotspots.',
     clinicalSign: 'Hyper-intense vascular leakage, localized inflammatory heat, and ischemia.',
@@ -62,7 +67,8 @@ export const VIEW_MODALITIES: ViewModalityConfig[] = [
     id: 'redfree',
     tabLabel: 'Red-Free',
     name: 'Red-Free 540nm (Green Band)',
-    icon: '🟢',
+    iconFamily: 'material',
+    iconName: 'contrast',
     badge: 'Ophthalmology Standard',
     description: 'Green wavelength filter that absorbs melanin and accentuates retinal vessels.',
     clinicalSign: 'Superficial retinal hemorrhages, nerve fiber layer defects, and micro-dot lesions.',
@@ -72,13 +78,24 @@ export const VIEW_MODALITIES: ViewModalityConfig[] = [
     id: 'vessels',
     tabLabel: 'Vessel Contrast',
     name: 'Deep Vessel & Microvascular Tree',
-    icon: '📐',
+    iconFamily: 'material',
+    iconName: 'vector-polyline',
     badge: 'Enhanced Angiography Mode',
     description: 'High-contrast edge filtering isolating arteriolar and venular caliber alterations.',
     clinicalSign: 'Vessel tortuosity, venous beading, and capillary non-perfusion zones.',
     findings: 'Preserved vessel caliber; mild arteriovenous crossing nipping noted.',
   },
 ];
+
+export const renderModalityIcon = (m: ViewModalityConfig, size = 18, color = colors.primary) => {
+  if (m.iconFamily === 'ionicons') {
+    return <Ionicons name={m.iconName as any} size={size} color={color} />;
+  }
+  if (m.iconFamily === 'material') {
+    return <MaterialCommunityIcons name={m.iconName as any} size={size} color={color} />;
+  }
+  return <FontAwesome5 name={m.iconName as any} size={size} color={color} />;
+};
 
 export const ReportScreen: React.FC = () => {
   const {
@@ -167,13 +184,13 @@ export const ReportScreen: React.FC = () => {
             activeOpacity={0.7}
             onPress={handleBack}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <Ionicons name="arrow-back" size={20} color={colors.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Clinical Report</Text>
         </View>
 
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>📄</Text>
+          <Ionicons name="document-text-outline" size={48} color={colors.primary} style={{ marginBottom: 16 }} />
           <Text style={styles.emptyTitle}>No Report Generated Yet</Text>
           <Text style={styles.emptySub}>
             Take a retinal photo with the camera to generate your AI screening report, evidence maps, and specialist recommendation.
@@ -183,7 +200,8 @@ export const ReportScreen: React.FC = () => {
             activeOpacity={0.85}
             onPress={() => navigate('eyeCamera')}
           >
-            <Text style={styles.emptyScanBtnText}>📸 Start Retinal Scan</Text>
+            <Ionicons name="camera" size={18} color="#ffffff" style={{ marginRight: 8 }} />
+            <Text style={styles.emptyScanBtnText}>Start Retinal Scan</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -200,7 +218,7 @@ export const ReportScreen: React.FC = () => {
           onPress={handleBack}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
         </TouchableOpacity>
 
         <View style={styles.headerTitleBox}>
@@ -214,7 +232,7 @@ export const ReportScreen: React.FC = () => {
             activeOpacity={0.7}
             onPress={() => setShowProfileModal(true)}
           >
-            <Text style={styles.profileIconText}>👤</Text>
+            <Ionicons name="person-circle-outline" size={22} color={colors.textPrimary} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -247,7 +265,8 @@ export const ReportScreen: React.FC = () => {
               Age {patientAge} · Date: {record?.date || 'Today'}
             </Text>
             <View style={styles.fieldWorkerTagRow}>
-              <Text style={styles.fieldWorkerTagText}>📍 Captured by Healthcare Field Worker</Text>
+              <Ionicons name="location-outline" size={11} color="#0369a1" style={{ marginRight: 3 }} />
+              <Text style={styles.fieldWorkerTagText}>Captured by Healthcare Field Worker</Text>
             </View>
           </View>
           <View style={[
@@ -267,7 +286,7 @@ export const ReportScreen: React.FC = () => {
         {qualityStatus === 'retake_needed' ? (
           <View style={styles.retakeBanner}>
             <View style={styles.retakeIconCircle}>
-              <Text style={styles.retakeIconText}>⚠️</Text>
+              <Ionicons name="warning-outline" size={18} color="#d97706" />
             </View>
             <View style={styles.retakeTextCol}>
               <Text style={styles.retakeBannerTitle}>Retake Advised by Backend</Text>
@@ -279,14 +298,15 @@ export const ReportScreen: React.FC = () => {
                 activeOpacity={0.85}
                 onPress={() => navigate('eyeCamera')}
               >
-                <Text style={styles.retakeCtaBtnText}>📸 Retake Photo Now</Text>
+                <Ionicons name="camera" size={14} color="#ffffff" style={{ marginRight: 6 }} />
+                <Text style={styles.retakeCtaBtnText}>Retake Photo Now</Text>
               </TouchableOpacity>
             </View>
           </View>
         ) : (
           <View style={styles.verifiedBanner}>
             <View style={styles.verifiedIconCircle}>
-              <Text style={styles.verifiedIconText}>✓</Text>
+              <Ionicons name="checkmark-sharp" size={14} color="#ffffff" />
             </View>
             <View style={styles.verifiedTextCol}>
               <Text style={styles.verifiedBannerTitle}>Quality Verified</Text>
@@ -385,7 +405,8 @@ export const ReportScreen: React.FC = () => {
               activeOpacity={0.75}
               onPress={() => setShowViewerModal(true)}
             >
-              <Text style={styles.viewMoreHeaderBtnText}>🔍 View More</Text>
+              <Ionicons name="scan-outline" size={13} color={colors.primary} style={{ marginRight: 4 }} />
+              <Text style={styles.viewMoreHeaderBtnText}>View More</Text>
             </TouchableOpacity>
           </View>
 
@@ -437,7 +458,8 @@ export const ReportScreen: React.FC = () => {
                 <View style={styles.redFreeHemoMarkerA} />
                 <View style={styles.redFreeHemoMarkerB} />
                 <View style={styles.redFreeBadge}>
-                  <Text style={styles.redFreeBadgeText}>🟢 540nm Green Filter (Red-Free)</Text>
+                  <MaterialCommunityIcons name="contrast" size={12} color="#34d399" style={{ marginRight: 4 }} />
+                  <Text style={styles.redFreeBadgeText}>540nm Green Filter (Red-Free)</Text>
                 </View>
               </View>
             )}
@@ -446,7 +468,8 @@ export const ReportScreen: React.FC = () => {
               <View style={styles.vesselsOverlay}>
                 <View style={styles.vesselsVascularBranch} />
                 <View style={styles.vesselsBadge}>
-                  <Text style={styles.vesselsBadgeText}>📐 Deep Vessel Contrast & Microaneurysms</Text>
+                  <MaterialCommunityIcons name="vector-polyline" size={12} color="#38bdf8" style={{ marginRight: 4 }} />
+                  <Text style={styles.vesselsBadgeText}>Deep Vessel Contrast & Microaneurysms</Text>
                 </View>
               </View>
             )}
@@ -459,14 +482,17 @@ export const ReportScreen: React.FC = () => {
               </View>
 
               <View style={styles.tapToZoomPill}>
-                <Text style={styles.tapToZoomText}>Tap to inspect high-res ⛶</Text>
+                <Ionicons name="expand-outline" size={12} color="#93c5fd" style={{ marginRight: 4 }} />
+                <Text style={styles.tapToZoomText}>Tap to inspect high-res</Text>
               </View>
             </View>
           </TouchableOpacity>
 
           {/* Clinical Modality Description Banner */}
           <View style={styles.modalityInfoBanner}>
-            <Text style={styles.modalityInfoIcon}>{activeModality.icon}</Text>
+            <View style={styles.modalityIconCircle}>
+              {renderModalityIcon(activeModality, 20, colors.primary)}
+            </View>
             <View style={styles.modalityInfoCol}>
               <Text style={styles.modalityInfoTitle}>{activeModality.name}</Text>
               <Text style={styles.modalityInfoDesc}>{activeModality.description}</Text>
@@ -486,6 +512,7 @@ export const ReportScreen: React.FC = () => {
           >
             {VIEW_MODALITIES.map((modality) => {
               const isSelected = selectedView === modality.id;
+              const iconColor = isSelected ? colors.primary : '#64748b';
               return (
                 <TouchableOpacity
                   key={modality.id}
@@ -496,14 +523,7 @@ export const ReportScreen: React.FC = () => {
                   activeOpacity={0.75}
                   onPress={() => setSelectedView(modality.id)}
                 >
-                  <Text
-                    style={[
-                      styles.modalityTabIcon,
-                      isSelected && styles.modalityTabIconActive,
-                    ]}
-                  >
-                    {modality.icon}
-                  </Text>
+                  {renderModalityIcon(modality, 16, iconColor)}
                   <Text
                     style={[
                       styles.modalityTabTitle,
@@ -523,9 +543,12 @@ export const ReportScreen: React.FC = () => {
             activeOpacity={0.85}
             onPress={() => setShowViewerModal(true)}
           >
-            <Text style={styles.expandModalButtonText}>
-              🔍 Open Multi-Angle Retinal Viewer
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="eye-outline" size={18} color={colors.primary} style={{ marginRight: 6 }} />
+              <Text style={styles.expandModalButtonText}>
+                Open Multi-Angle Retinal Viewer
+              </Text>
+            </View>
             <Text style={styles.expandModalButtonSub}>
               Compare side-by-side or inspect thermal & vessel layers in full detail
             </Text>
@@ -544,7 +567,7 @@ export const ReportScreen: React.FC = () => {
 
           <View style={styles.doctorHeaderRow}>
             <View style={styles.doctorAvatarBox}>
-              <Text style={styles.doctorAvatarIcon}>👨‍⚕️</Text>
+              <FontAwesome5 name="user-md" size={24} color={colors.primary} />
             </View>
             <View style={styles.doctorInfoCol}>
               <Text style={styles.doctorName}>{recommendedDoctor.name}</Text>
@@ -556,7 +579,7 @@ export const ReportScreen: React.FC = () => {
           <View style={styles.doctorDivider} />
 
           <View style={styles.timeframeRow}>
-            <Text style={styles.timeframeIcon}>⏰</Text>
+            <Ionicons name="time-outline" size={16} color={colors.primary} style={{ marginRight: 6 }} />
             <Text style={styles.timeframeText}>{recommendedDoctor.timeframe}</Text>
           </View>
 
@@ -572,7 +595,8 @@ export const ReportScreen: React.FC = () => {
                 )
               }
             >
-              <Text style={styles.contactBtnText}>📞 Contact Specialist Clinic</Text>
+              <Ionicons name="call-outline" size={16} color="#ffffff" style={{ marginRight: 6 }} />
+              <Text style={styles.contactBtnText}>Contact Specialist Clinic</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -582,7 +606,7 @@ export const ReportScreen: React.FC = () => {
           <View style={[styles.card, styles.doctorReviewActionCard]}>
             <View style={styles.doctorReviewHeaderRow}>
               <View style={styles.doctorReviewIconCircle}>
-                <Text style={styles.doctorReviewIcon}>🩺</Text>
+                <MaterialCommunityIcons name="stethoscope" size={22} color="#0284c7" />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.doctorReviewTitle}>Doctor Clinical Decision</Text>
@@ -603,8 +627,9 @@ export const ReportScreen: React.FC = () => {
                 setDecisionMessage(`Report verified & digitally endorsed by Doctor for ${patientName}.`);
               }}
             >
+              <Ionicons name="checkmark-circle-outline" size={18} color="#ffffff" style={{ marginRight: 6 }} />
               <Text style={styles.doctorConfirmBtnText}>
-                {doctorSigned ? '✓ Endorsed & Signed by Doctor' : '✓ Confirm & Sign Result'}
+                {doctorSigned ? 'Endorsed & Signed by Doctor' : 'Confirm & Sign Result'}
               </Text>
             </TouchableOpacity>
 
@@ -613,7 +638,8 @@ export const ReportScreen: React.FC = () => {
               activeOpacity={0.85}
               onPress={() => setShowOverrideModal(true)}
             >
-              <Text style={styles.doctorOverrideBtnText}>✎ Override Result / Clinical Revision</Text>
+              <Ionicons name="create-outline" size={16} color="#0284c7" style={{ marginRight: 6 }} />
+              <Text style={styles.doctorOverrideBtnText}>Override Result / Clinical Revision</Text>
             </TouchableOpacity>
 
             {decisionMessage ? (
@@ -646,7 +672,7 @@ export const ReportScreen: React.FC = () => {
                 onPress={() => setShowOverrideModal(false)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <Text style={styles.overrideModalClose}>✕</Text>
+                <Ionicons name="close" size={22} color={colors.textMuted} />
               </TouchableOpacity>
             </View>
             <Text style={styles.overrideModalSubtitle}>
@@ -662,7 +688,10 @@ export const ReportScreen: React.FC = () => {
                 setShowOverrideModal(false);
               }}
             >
-              <Text style={styles.overrideOptionTitle}>🟢 No DR / Normal (Clinically Insignificant)</Text>
+              <View style={styles.overrideOptionHeaderRow}>
+                <View style={[styles.overrideBadgeDot, { backgroundColor: '#10b981' }]} />
+                <Text style={styles.overrideOptionTitle}>No DR / Normal (Clinically Insignificant)</Text>
+              </View>
               <Text style={styles.overrideOptionSub}>No microaneurysms, vessels clear. Routine 1-year follow-up.</Text>
             </TouchableOpacity>
 
@@ -675,7 +704,10 @@ export const ReportScreen: React.FC = () => {
                 setShowOverrideModal(false);
               }}
             >
-              <Text style={styles.overrideOptionTitle}>🟡 Mild NPDR (Microaneurysms Only)</Text>
+              <View style={styles.overrideOptionHeaderRow}>
+                <View style={[styles.overrideBadgeDot, { backgroundColor: '#f59e0b' }]} />
+                <Text style={styles.overrideOptionTitle}>Mild NPDR (Microaneurysms Only)</Text>
+              </View>
               <Text style={styles.overrideOptionSub}>Strict glycemic control & primary care review within 6 months.</Text>
             </TouchableOpacity>
 
@@ -688,9 +720,12 @@ export const ReportScreen: React.FC = () => {
                 setShowOverrideModal(false);
               }}
             >
-              <Text style={[styles.overrideOptionTitle, { color: '#dc2626' }]}>
-                🔴 Severe DR / Clinically Significant Macular Edema
-              </Text>
+              <View style={styles.overrideOptionHeaderRow}>
+                <View style={[styles.overrideBadgeDot, { backgroundColor: '#ef4444' }]} />
+                <Text style={[styles.overrideOptionTitle, { color: '#dc2626' }]}>
+                  Severe DR / Clinically Significant Macular Edema
+                </Text>
+              </View>
               <Text style={styles.overrideOptionSub}>Immediate laser photocoagulation or anti-VEGF referral.</Text>
             </TouchableOpacity>
 
@@ -719,7 +754,8 @@ export const ReportScreen: React.FC = () => {
               activeOpacity={0.7}
               onPress={() => setShowViewerModal(false)}
             >
-              <Text style={styles.modalCloseBtnText}>✕ Close</Text>
+              <Ionicons name="close" size={18} color="#ffffff" style={{ marginRight: 4 }} />
+              <Text style={styles.modalCloseBtnText}>Close</Text>
             </TouchableOpacity>
 
             <View style={styles.modalHeaderCenter}>
@@ -742,7 +778,9 @@ export const ReportScreen: React.FC = () => {
             {/* Active Modality Title Banner */}
             <View style={styles.modalActiveBanner}>
               <View style={styles.modalActiveBannerLeft}>
-                <Text style={styles.modalActiveBannerIcon}>{activeModality.icon}</Text>
+                <View style={styles.modalActiveBannerIconBox}>
+                  {renderModalityIcon(activeModality, 24, '#38bdf8')}
+                </View>
                 <View>
                   <Text style={styles.modalActiveBannerTitle}>{activeModality.name}</Text>
                   <Text style={styles.modalActiveBannerTag}>{activeModality.badge}</Text>
@@ -770,7 +808,8 @@ export const ReportScreen: React.FC = () => {
                   <View style={styles.modalHeatCircleMinor} />
                   <View style={styles.modalHeatCircleMacula} />
                   <View style={styles.modalLesionCrosshair}>
-                    <Text style={styles.modalCrosshairText}>🎯 Lesion Cluster (Weight: 0.93)</Text>
+                    <MaterialCommunityIcons name="target" size={14} color="#ef4444" style={{ marginRight: 4 }} />
+                    <Text style={styles.modalCrosshairText}>Lesion Cluster (Weight: 0.93)</Text>
                   </View>
                 </View>
               )}
@@ -799,8 +838,9 @@ export const ReportScreen: React.FC = () => {
                   <View style={styles.modalRedFreeDotB} />
                   <View style={styles.modalRedFreeDotC} />
                   <View style={styles.modalRedFreeBanner}>
+                    <MaterialCommunityIcons name="contrast" size={14} color="#34d399" style={{ marginRight: 6 }} />
                     <Text style={styles.modalRedFreeBannerText}>
-                      🟢 Green Channel Active: Microaneurysms appear sharp black against green background
+                      Green Channel Active: Microaneurysms appear sharp black against green background
                     </Text>
                   </View>
                 </View>
@@ -811,8 +851,9 @@ export const ReportScreen: React.FC = () => {
                   <View style={styles.modalVesselBranch1} />
                   <View style={styles.modalVesselBranch2} />
                   <View style={styles.modalVesselBanner}>
+                    <MaterialCommunityIcons name="vector-polyline" size={14} color="#38bdf8" style={{ marginRight: 6 }} />
                     <Text style={styles.modalVesselBannerText}>
-                      📐 Angiographic Contrast: Arteriole/Venule Caliber Ratio (A/V) = 0.67
+                      Angiographic Contrast: Arteriole/Venule Caliber Ratio (A/V) = 0.67
                     </Text>
                   </View>
                 </View>
@@ -824,6 +865,7 @@ export const ReportScreen: React.FC = () => {
             <View style={styles.modalTabsRow}>
               {VIEW_MODALITIES.map((modality) => {
                 const isSelected = selectedView === modality.id;
+                const iconColor = isSelected ? '#ffffff' : '#94a3b8';
                 return (
                   <TouchableOpacity
                     key={modality.id}
@@ -834,7 +876,7 @@ export const ReportScreen: React.FC = () => {
                     activeOpacity={0.75}
                     onPress={() => setSelectedView(modality.id)}
                   >
-                    <Text style={styles.modalTabChipIcon}>{modality.icon}</Text>
+                    {renderModalityIcon(modality, 16, iconColor)}
                     <Text
                       style={[
                         styles.modalTabChipText,
@@ -934,11 +976,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backIcon: {
-    fontSize: 20,
-    color: colors.primary,
-    fontWeight: '700',
-  },
   headerTitleBox: {
     flex: 1,
     marginLeft: 12,
@@ -967,9 +1004,6 @@ const styles = StyleSheet.create({
     borderColor: '#e8edf3',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  profileIconText: {
-    fontSize: 16,
   },
   historyBtn: {
     backgroundColor: colors.primaryMuted,
@@ -1033,17 +1067,19 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   fieldWorkerTagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 4,
     alignSelf: 'flex-start',
+    backgroundColor: '#f0f9ff',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
   },
   fieldWorkerTagText: {
     fontSize: 10,
     color: '#0369a1',
     fontWeight: '700',
-    backgroundColor: '#f0f9ff',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
   },
   patientStatusPill: {
     paddingHorizontal: 10,
@@ -1085,11 +1121,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
-  },
-  verifiedIconText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '800',
   },
   verifiedTextCol: {
     flex: 1,
@@ -1134,9 +1165,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
   },
-  retakeIconText: {
-    fontSize: 16,
-  },
   retakeTextCol: {
     flex: 1,
   },
@@ -1153,6 +1181,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   retakeCtaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
     backgroundColor: '#d97706',
     paddingHorizontal: 14,
@@ -1289,6 +1319,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   viewMoreHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#eff6ff',
     borderWidth: 1,
     borderColor: '#bfdbfe',
@@ -1488,6 +1520,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'rgba(6, 78, 59, 0.85)',
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -1520,6 +1554,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'rgba(12, 74, 110, 0.85)',
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -1559,6 +1595,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   tapToZoomPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'rgba(15, 23, 42, 0.88)',
     paddingHorizontal: 9,
     paddingVertical: 5,
@@ -1578,11 +1616,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#edf2f7',
     marginBottom: 14,
-    gap: 10,
+    gap: 12,
+    alignItems: 'flex-start',
   },
-  modalityInfoIcon: {
-    fontSize: 22,
-    marginTop: 2,
+  modalityIconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: colors.primaryMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalityInfoCol: {
     flex: 1,
@@ -1625,13 +1668,6 @@ const styles = StyleSheet.create({
   modalityTabBtnActive: {
     backgroundColor: '#eff6ff',
     borderColor: colors.primary,
-  },
-  modalityTabIcon: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-  modalityTabIconActive: {
-    opacity: 1,
   },
   modalityTabTitle: {
     fontSize: 12,
@@ -1681,6 +1717,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#0f172a',
   },
   modalCloseBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#1e293b',
     paddingHorizontal: 12,
     paddingVertical: 7,
@@ -1737,8 +1775,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  modalActiveBannerIcon: {
-    fontSize: 26,
+  modalActiveBannerIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: '#0f172a',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalActiveBannerTitle: {
     color: '#ffffff',
@@ -1807,6 +1850,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     left: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'rgba(15, 23, 42, 0.9)',
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -1941,6 +1986,8 @@ const styles = StyleSheet.create({
     bottom: 16,
     left: 16,
     right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'rgba(6, 78, 59, 0.95)',
     padding: 10,
     borderRadius: 12,
@@ -1950,6 +1997,7 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     fontWeight: '700',
     lineHeight: 15,
+    flex: 1,
   },
   modalVesselsOverlay: {
     position: 'absolute',
@@ -1982,6 +2030,8 @@ const styles = StyleSheet.create({
     bottom: 16,
     left: 16,
     right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'rgba(12, 74, 110, 0.95)',
     padding: 10,
     borderRadius: 12,
@@ -1991,6 +2041,7 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     fontWeight: '700',
     lineHeight: 15,
+    flex: 1,
   },
   modalFilterSectionTitle: {
     color: '#94a3b8',
@@ -2019,9 +2070,6 @@ const styles = StyleSheet.create({
   modalTabChipActive: {
     backgroundColor: '#1e3a8a',
     borderColor: '#60a5fa',
-  },
-  modalTabChipIcon: {
-    fontSize: 14,
   },
   modalTabChipText: {
     color: '#94a3b8',
@@ -2125,9 +2173,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 14,
   },
-  doctorAvatarIcon: {
-    fontSize: 24,
-  },
   doctorInfoCol: {
     flex: 1,
   },
@@ -2155,11 +2200,7 @@ const styles = StyleSheet.create({
   timeframeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     marginBottom: 12,
-  },
-  timeframeIcon: {
-    fontSize: 14,
   },
   timeframeText: {
     fontSize: 12,
@@ -2167,10 +2208,11 @@ const styles = StyleSheet.create({
     color: '#475569',
   },
   contactBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.primary,
     borderRadius: 14,
     height: 44,
-    alignItems: 'center',
     justifyContent: 'center',
   },
   contactBtnText: {
@@ -2183,10 +2225,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 19,
@@ -2203,6 +2241,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyScanBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 13,
@@ -2243,9 +2283,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#bae6fd',
-  },
-  doctorReviewIcon: {
-    fontSize: 22,
   },
   doctorReviewTitle: {
     fontSize: 16,
@@ -2340,12 +2377,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: colors.textPrimary,
   },
-  overrideModalClose: {
-    fontSize: 18,
-    color: '#64748b',
-    fontWeight: '700',
-    padding: 4,
-  },
   overrideModalSubtitle: {
     fontSize: 12.5,
     color: '#64748b',
@@ -2360,6 +2391,17 @@ const styles = StyleSheet.create({
     padding: 13,
     marginBottom: 10,
   },
+  overrideOptionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 3,
+  },
+  overrideBadgeDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
+  },
   overrideOptionBtnUrgent: {
     backgroundColor: '#fef2f2',
     borderColor: '#fca5a5',
@@ -2368,7 +2410,6 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 3,
   },
   overrideOptionSub: {
     fontSize: 11,

@@ -7,6 +7,7 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 
@@ -103,7 +104,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               onPress={onClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={styles.closeBtnText}>✕</Text>
+              <Ionicons name="close" size={20} color="#64748b" />
             </TouchableOpacity>
           </View>
 
@@ -233,7 +234,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 activeOpacity={0.85}
                 onPress={handleEditProfile}
               >
-                <Text style={styles.editBtnText}>✏️ Edit Profile</Text>
+                <Ionicons name="create-outline" size={16} color="#ffffff" style={{ marginRight: 6 }} />
+                <Text style={styles.editBtnText}>Edit Profile</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -241,7 +243,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 activeOpacity={0.8}
                 onPress={handleSignOut}
               >
-                <Text style={styles.signOutBtnText}>🚪 Sign Out</Text>
+                <Ionicons name="log-out-outline" size={16} color="#ef4444" style={{ marginRight: 6 }} />
+                <Text style={styles.signOutBtnText}>Sign Out</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -405,6 +408,7 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 14,
     backgroundColor: colors.primary,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -419,6 +423,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2f2',
     borderWidth: 1,
     borderColor: '#fee2e2',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },

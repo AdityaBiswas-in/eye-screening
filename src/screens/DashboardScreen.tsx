@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
-import { RetinaLogo } from '../components/RetinaLogo';
+import { RetinaLogo, RetinaAppBrand } from '../components/RetinaLogo';
 import { LanguageModal } from '../components/LanguageModal';
 import { ProfileModal } from '../components/ProfileModal';
 import { LANGUAGES } from '../i18n/translations';
@@ -41,19 +42,17 @@ export const DashboardScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top Bar */}
-        <View style={styles.topBar}>
-          <View>
-            <Text style={styles.greeting}>Welcome back,</Text>
-            <Text style={styles.userName}>{displayName}</Text>
-          </View>
+        {/* Top Brand Header */}
+        <View style={styles.brandRow}>
+          <RetinaAppBrand size={32} />
           <View style={styles.topRightActions}>
             <TouchableOpacity
               style={styles.langPillButton}
               activeOpacity={0.7}
               onPress={() => setShowLanguageModal(true)}
             >
-              <Text style={styles.langPillText}>🌐 {currentLang.nativeName}</Text>
+              <Ionicons name="globe-outline" size={13} color={colors.primary} style={{ marginRight: 4 }} />
+              <Text style={styles.langPillText}>{currentLang.nativeName}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -61,9 +60,15 @@ export const DashboardScreen: React.FC = () => {
               activeOpacity={0.7}
               onPress={() => setShowProfileModal(true)}
             >
-              <Text style={styles.profileIconText}>👤</Text>
+              <Ionicons name="person-circle-outline" size={22} color={colors.textPrimary} />
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Top Bar Greeting */}
+        <View style={styles.greetingBar}>
+          <Text style={styles.greeting}>Welcome back,</Text>
+          <Text style={styles.userName}>{displayName}</Text>
         </View>
 
         {/* Status Card */}
@@ -101,7 +106,8 @@ export const DashboardScreen: React.FC = () => {
             activeOpacity={0.85}
             onPress={() => navigate('eyeCamera')}
           >
-            <Text style={styles.actionButtonText}>📸 Start Retinal Scan</Text>
+            <Ionicons name="camera" size={18} color="#ffffff" style={{ marginRight: 8 }} />
+            <Text style={styles.actionButtonText}>Start Retinal Scan</Text>
           </TouchableOpacity>
         </View>
 
@@ -114,12 +120,14 @@ export const DashboardScreen: React.FC = () => {
             activeOpacity={0.7}
             onPress={() => navigate('screeningHistory')}
           >
-            <Text style={styles.toolEmoji}>📋</Text>
+            <View style={styles.toolIconCircle}>
+              <MaterialCommunityIcons name="clipboard-text-outline" size={22} color={colors.primary} />
+            </View>
             <View style={styles.toolInfo}>
               <Text style={styles.toolTitle}>Screening History</Text>
               <Text style={styles.toolSub}>Track past scans and DR progression</Text>
             </View>
-            <Text style={styles.toolChevron}>›</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -127,12 +135,14 @@ export const DashboardScreen: React.FC = () => {
             activeOpacity={0.7}
             onPress={() => navigate('reportScreen')}
           >
-            <Text style={styles.toolEmoji}>📄</Text>
+            <View style={[styles.toolIconCircle, { backgroundColor: '#eff6ff' }]}>
+              <Ionicons name="document-text-outline" size={22} color="#2563eb" />
+            </View>
             <View style={styles.toolInfo}>
               <Text style={styles.toolTitle}>Latest Screening Report</Text>
               <Text style={styles.toolSub}>AI diagnostic findings, evidence & doctors</Text>
             </View>
-            <Text style={styles.toolChevron}>›</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -140,14 +150,16 @@ export const DashboardScreen: React.FC = () => {
             activeOpacity={0.7}
             onPress={() => setShowLanguageModal(true)}
           >
-            <Text style={styles.toolEmoji}>🌐</Text>
+            <View style={[styles.toolIconCircle, { backgroundColor: '#f0fdf4' }]}>
+              <Ionicons name="language-outline" size={22} color="#16a34a" />
+            </View>
             <View style={styles.toolInfo}>
               <Text style={styles.toolTitle}>Change Language</Text>
               <Text style={styles.toolSub}>
                 Currently set to {currentLang.nativeName} ({language.toUpperCase()})
               </Text>
             </View>
-            <Text style={styles.toolChevron}>›</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
           </TouchableOpacity>
         </View>
 
@@ -157,6 +169,7 @@ export const DashboardScreen: React.FC = () => {
           activeOpacity={0.75}
           onPress={handleSignOut}
         >
+          <Ionicons name="log-out-outline" size={18} color="#ef4444" style={{ marginRight: 8 }} />
           <Text style={styles.signOutButtonText}>Sign Out of RetinaCare</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -192,12 +205,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
+  brandRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingTop: 4,
+  },
+  greetingBar: {
+    marginBottom: 20,
+  },
   topRightActions: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
   langPillButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 6,
     backgroundColor: '#ffffff',
@@ -219,9 +244,6 @@ const styles = StyleSheet.create({
     borderColor: '#e2e8f0',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  profileIconText: {
-    fontSize: 16,
   },
   greeting: {
     fontSize: 14,
@@ -328,8 +350,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e8edf3',
   },
-  toolEmoji: {
-    fontSize: 22,
+  toolIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: colors.primaryMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 14,
   },
   toolInfo: {

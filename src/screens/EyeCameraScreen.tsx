@@ -7,7 +7,9 @@ import {
   Pressable,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
+import { colors } from '../theme/colors';
 
 export const EyeCameraScreen: React.FC = () => {
   const { navigate, goBack, canGoBack, userRole } = useApp();
@@ -90,7 +92,7 @@ export const EyeCameraScreen: React.FC = () => {
           onPress={handleExit}
           hitSlop={15}
         >
-          <Text style={styles.backIcon}>‹</Text>
+          <Ionicons name="arrow-back" size={20} color={colors.textPrimary} />
         </Pressable>
 
         <Text style={styles.headerTitle}>Capture fundus image</Text>
@@ -141,7 +143,7 @@ export const EyeCameraScreen: React.FC = () => {
           >
             <View style={goodLighting ? styles.checkBadgeGreen : styles.checkBadgeGray}>
               {goodLighting ? (
-                <Text style={styles.checkBadgeIcon}>✓</Text>
+                <Ionicons name="checkmark" size={13} color="#ffffff" />
               ) : (
                 <View style={styles.checkDotInner} />
               )}
@@ -159,7 +161,7 @@ export const EyeCameraScreen: React.FC = () => {
           >
             <View style={retinaDetected ? styles.checkBadgeGreen : styles.checkBadgeGray}>
               {retinaDetected ? (
-                <Text style={styles.checkBadgeIcon}>✓</Text>
+                <Ionicons name="checkmark" size={13} color="#ffffff" />
               ) : (
                 <View style={styles.checkDotInner} />
               )}
@@ -177,7 +179,7 @@ export const EyeCameraScreen: React.FC = () => {
           >
             <View style={isSteady ? styles.checkBadgeGreen : styles.checkBadgeGray}>
               {isSteady ? (
-                <Text style={styles.checkBadgeIcon}>✓</Text>
+                <Ionicons name="checkmark" size={13} color="#ffffff" />
               ) : (
                 <View style={styles.checkDotInner} />
               )}
@@ -196,6 +198,7 @@ export const EyeCameraScreen: React.FC = () => {
           activeOpacity={0.85}
           onPress={handleCapture}
         >
+          <Ionicons name="camera" size={20} color="#ffffff" style={{ marginRight: 8 }} />
           <Text style={styles.captureButtonText}>Capture</Text>
         </TouchableOpacity>
 
@@ -204,6 +207,7 @@ export const EyeCameraScreen: React.FC = () => {
           activeOpacity={0.7}
           onPress={handleUploadImage}
         >
+          <Ionicons name="cloud-upload-outline" size={16} color={colors.primary} style={{ marginRight: 6 }} />
           <Text style={styles.uploadLinkText}>Upload existing image</Text>
         </TouchableOpacity>
       </View>

@@ -7,10 +7,9 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
-
-
 
 export const DoctorQueueScreen: React.FC = () => {
   const { goBack, screenings, viewReport } = useApp();
@@ -25,7 +24,7 @@ export const DoctorQueueScreen: React.FC = () => {
       `Diagnosis: ${item.condition}\nStatus: ${item.status}\nAI Confidence: ${item.aiConfidence || 94}%\nImage Quality: ${item.imageQuality || 'Good'}\nCaptured by field worker with high-res fundus camera.`,
       [
         {
-          text: '📄 Open Full Screening Report',
+          text: 'Open Full Screening Report',
           onPress: () => handleOpenReport(item),
         },
         {
@@ -54,7 +53,7 @@ export const DoctorQueueScreen: React.FC = () => {
             activeOpacity={0.7}
             onPress={goBack}
           >
-            <Text style={styles.backArrow}>‹</Text>
+            <Ionicons name="arrow-back" size={20} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Review queue</Text>
         </View>
@@ -62,7 +61,7 @@ export const DoctorQueueScreen: React.FC = () => {
         {/* List of Cases or Clean Empty State */}
         {screenings.length === 0 ? (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyEmoji}>📋</Text>
+            <MaterialCommunityIcons name="clipboard-check-outline" size={38} color="#94a3b8" />
             <Text style={styles.emptyTitle}>Queue is empty</Text>
             <Text style={styles.emptySubtitle}>
               No screenings currently awaiting doctor review. New screenings submitted by healthcare field workers will appear here.
@@ -135,8 +134,9 @@ export const DoctorQueueScreen: React.FC = () => {
                     </Text>
                   </View>
                   <View style={styles.capturedBadge}>
+                    <Ionicons name="camera-outline" size={13} color="#1d4ed8" />
                     <Text style={styles.capturedBadgeText}>
-                      📸 Field Worker Capture
+                      Field Worker Capture
                     </Text>
                   </View>
                 </View>
@@ -148,8 +148,9 @@ export const DoctorQueueScreen: React.FC = () => {
                     activeOpacity={0.8}
                     onPress={() => handleOpenReport(item)}
                   >
+                    <Ionicons name="document-text-outline" size={15} color="#ffffff" />
                     <Text style={styles.viewReportActionBtnText}>
-                      📄 View Full Report
+                      View Full Report
                     </Text>
                   </TouchableOpacity>
 
@@ -158,7 +159,8 @@ export const DoctorQueueScreen: React.FC = () => {
                     activeOpacity={0.8}
                     onPress={() => handleReviewCase(item)}
                   >
-                    <Text style={styles.quickReviewBtnText}>⚡ Quick Review</Text>
+                    <Ionicons name="flash-outline" size={14} color={colors.textPrimary} />
+                    <Text style={styles.quickReviewBtnText}>Quick Review</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -350,6 +352,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#dbeafe',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   capturedBadgeText: {
     fontSize: 10.5,
@@ -368,8 +373,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: 12,
     borderRadius: 12,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.22,
@@ -388,8 +395,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     paddingHorizontal: 10,
     borderRadius: 12,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 5,
     borderWidth: 1.2,
     borderColor: '#cbd5e1',
     shadowColor: '#000000',
