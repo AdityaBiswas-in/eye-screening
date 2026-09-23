@@ -64,7 +64,6 @@ export const PatientProfileScreen: React.FC = () => {
 
   const diabetesOptions: { label: string; value: DiabetesOption }[] = [
     { label: t.yes, value: 'Yes' },
-    { label: t.no, value: 'No' },
     { label: t.notSure, value: 'Not sure' },
   ];
 

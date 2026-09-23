@@ -40,8 +40,8 @@ export const ScreeningHistoryScreen: React.FC = () => {
   const patientDiabetes =
     patientProfile.hasDiabetes === 'Yes'
       ? 'Diabetes 12 years'
-      : patientProfile.hasDiabetes === 'No'
-      ? 'Non-diabetic'
+      : patientProfile.hasDiabetes === 'Not sure'
+      ? 'Diabetes status not sure'
       : 'Diabetes 12 years';
 
   // Base clinical history records matching design

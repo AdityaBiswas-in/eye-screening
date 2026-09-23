@@ -19,7 +19,7 @@ export type UserRole = 'patient' | 'worker' | 'doctor';
 
 export type SexOption = 'Female' | 'Male' | 'Other';
 
-export type DiabetesOption = 'Yes' | 'No' | 'Not sure';
+export type DiabetesOption = 'Yes' | 'Not sure';
 
 export interface UserAccount {
   fullName: string;
