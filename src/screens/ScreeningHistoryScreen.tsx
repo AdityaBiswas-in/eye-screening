@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
+import { ProfileModal } from '../components/ProfileModal';
 
 interface HistoryRecord {
   id: string;
@@ -21,6 +22,7 @@ interface HistoryRecord {
 
 export const ScreeningHistoryScreen: React.FC = () => {
   const { goBack, canGoBack, navigate, patientProfile, account, screenings, viewReport } = useApp();
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Dynamic patient header info from user profile/account
   const patientName =
@@ -85,14 +87,24 @@ export const ScreeningHistoryScreen: React.FC = () => {
     <View style={styles.container}>
       {/* Top Header */}
       <View style={styles.topHeader}>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity
+            style={styles.backButton}
+            activeOpacity={0.7}
+            onPress={handleBack}
+          >
+            <Text style={styles.backIcon}>‹</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Screening history</Text>
+        </View>
+
         <TouchableOpacity
-          style={styles.backButton}
+          style={styles.profileIconButton}
           activeOpacity={0.7}
-          onPress={handleBack}
+          onPress={() => setShowProfileModal(true)}
         >
-          <Text style={styles.backIcon}>‹</Text>
+          <Text style={styles.profileIconText}>👤</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Screening history</Text>
       </View>
 
       <ScrollView
@@ -228,6 +240,12 @@ export const ScreeningHistoryScreen: React.FC = () => {
         </>
       )}
       </ScrollView>
+
+      {/* Profile Details Modal */}
+      <ProfileModal
+        visible={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </View>
   );
 };
@@ -240,9 +258,32 @@ const styles = StyleSheet.create({
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileIconButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e8edf3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.shadowColor,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  profileIconText: {
+    fontSize: 18,
   },
   backButton: {
     width: 42,

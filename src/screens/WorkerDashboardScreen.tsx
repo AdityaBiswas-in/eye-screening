@@ -14,13 +14,15 @@ import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { ScreeningRecord } from '../types';
 import { LanguageModal } from '../components/LanguageModal';
+import { ProfileModal } from '../components/ProfileModal';
 import { LANGUAGES } from '../i18n/translations';
 
 export const WorkerDashboardScreen: React.FC = () => {
-  const { navigate, screenings, addScreening, signOut, workerProfile, language } = useApp();
+  const { navigate, screenings, addScreening, signOut, language } = useApp();
   const [activeTab, setActiveTab] = useState<'home' | 'patients' | 'scan' | 'reports' | 'profile'>('home');
   const [showScanModal, setShowScanModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const currentLang = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
@@ -89,6 +91,14 @@ export const WorkerDashboardScreen: React.FC = () => {
               onPress={() => setShowLanguageModal(true)}
             >
               <Text style={styles.langPillText}>🌐 {currentLang.nativeName}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.profileIconButton}
+              activeOpacity={0.7}
+              onPress={() => setShowProfileModal(true)}
+            >
+              <Text style={styles.profileIconText}>👤</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -430,20 +440,7 @@ export const WorkerDashboardScreen: React.FC = () => {
         {/* Profile */}
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() =>
-            Alert.alert(
-              'Screening Worker Account',
-              `User: ${workerProfile.fullName || 'Screening Worker'}\nCentre: ${
-                workerProfile.healthcareCentre || 'Rural Health Centre'
-              }`,
-              [
-                { text: 'Change Language', onPress: () => setShowLanguageModal(true) },
-                { text: 'Edit Profile', onPress: () => navigate('workerProfile') },
-                { text: 'Sign Out', style: 'destructive', onPress: handleSignOut },
-                { text: 'Cancel', style: 'cancel' },
-              ]
-            )
-          }
+          onPress={() => setShowProfileModal(true)}
         >
           <Text style={[styles.navIcon, activeTab === 'profile' && styles.navIconActive]}>
             👤
@@ -458,6 +455,12 @@ export const WorkerDashboardScreen: React.FC = () => {
       <LanguageModal
         visible={showLanguageModal}
         onClose={() => setShowLanguageModal(false)}
+      />
+
+      {/* Profile Details Modal */}
+      <ProfileModal
+        visible={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
       />
     </View>
   );
@@ -493,6 +496,19 @@ const styles = StyleSheet.create({
     borderColor: '#e8edf3',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  profileIconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e8edf3',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileIconText: {
+    fontSize: 18,
   },
   langPillText: {
     fontSize: 12,

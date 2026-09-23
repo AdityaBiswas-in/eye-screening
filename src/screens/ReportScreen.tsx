@@ -11,6 +11,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { ScreeningRecord } from '../types';
+import { ProfileModal } from '../components/ProfileModal';
 
 export const ReportScreen: React.FC = () => {
   const {
@@ -23,6 +24,8 @@ export const ReportScreen: React.FC = () => {
     patientProfile,
     account,
   } = useApp();
+
+  const [showProfileModal, setShowProfileModal] = React.useState(false);
 
   // If active record not set, fallback to the latest screening or null
   const record: ScreeningRecord | null =
@@ -126,13 +129,23 @@ export const ReportScreen: React.FC = () => {
           <Text style={styles.headerSub}>ID: {record?.id ? record.id.slice(-6) : 'REC-01'}</Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.historyBtn}
-          activeOpacity={0.7}
-          onPress={() => navigate('screeningHistory')}
-        >
-          <Text style={styles.historyBtnText}>History</Text>
-        </TouchableOpacity>
+        <View style={styles.headerRightActions}>
+          <TouchableOpacity
+            style={styles.profileIconButton}
+            activeOpacity={0.7}
+            onPress={() => setShowProfileModal(true)}
+          >
+            <Text style={styles.profileIconText}>👤</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.historyBtn}
+            activeOpacity={0.7}
+            onPress={() => navigate('screeningHistory')}
+          >
+            <Text style={styles.historyBtnText}>History</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -361,6 +374,12 @@ export const ReportScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Profile Details Modal */}
+      <ProfileModal
+        visible={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </View>
   );
 };
@@ -408,11 +427,29 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontWeight: '600',
   },
+  headerRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  profileIconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e8edf3',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileIconText: {
+    fontSize: 16,
+  },
   historyBtn: {
     backgroundColor: colors.primaryMuted,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
+    paddingVertical: 7,
+    borderRadius: 12,
   },
   historyBtnText: {
     color: colors.primary,

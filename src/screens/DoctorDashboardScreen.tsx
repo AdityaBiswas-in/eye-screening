@@ -10,6 +10,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { LanguageModal } from '../components/LanguageModal';
+import { ProfileModal } from '../components/ProfileModal';
 import { LANGUAGES } from '../i18n/translations';
 
 interface PriorityCase {
@@ -25,6 +26,7 @@ interface PriorityCase {
 export const DoctorDashboardScreen: React.FC = () => {
   const { doctorProfile, account, screenings, navigate, signOut, language } = useApp();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const currentLang = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
@@ -76,20 +78,7 @@ export const DoctorDashboardScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.profileButton}
               activeOpacity={0.7}
-              onPress={() =>
-                Alert.alert(
-                  `Dr. ${doctorName}`,
-                  `Specialty: ${doctorProfile.specialty || 'Ophthalmology'}\nHospital: ${
-                    doctorProfile.hospital || 'Eye Care Hospital'
-                  }`,
-                  [
-                    { text: 'Change Language', onPress: () => setShowLanguageModal(true) },
-                    { text: 'Edit Profile', onPress: () => navigate('doctorProfile') },
-                    { text: 'Sign Out', style: 'destructive', onPress: handleSignOut },
-                    { text: 'Cancel', style: 'cancel' },
-                  ]
-                )
-              }
+              onPress={() => setShowProfileModal(true)}
             >
               <Text style={styles.profileIcon}>👤</Text>
             </TouchableOpacity>
@@ -288,6 +277,12 @@ export const DoctorDashboardScreen: React.FC = () => {
       <LanguageModal
         visible={showLanguageModal}
         onClose={() => setShowLanguageModal(false)}
+      />
+
+      {/* Profile Details Modal */}
+      <ProfileModal
+        visible={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
       />
     </View>
   );

@@ -10,6 +10,7 @@ import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
 import { RetinaLogo } from '../components/RetinaLogo';
 import { LanguageModal } from '../components/LanguageModal';
+import { ProfileModal } from '../components/ProfileModal';
 import { LANGUAGES } from '../i18n/translations';
 
 export const DashboardScreen: React.FC = () => {
@@ -17,24 +18,18 @@ export const DashboardScreen: React.FC = () => {
     t,
     account,
     patientProfile,
-    userRole,
     language,
     navigate,
     signOut,
   } = useApp();
 
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const currentLang = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
   const handleSignOut = () => {
     signOut();
-  };
-
-  const roleTitles = {
-    patient: t.patientTitle,
-    worker: t.workerTitle,
-    doctor: t.doctorTitle,
   };
 
   const displayName =
@@ -61,9 +56,13 @@ export const DashboardScreen: React.FC = () => {
               <Text style={styles.langPillText}>🌐 {currentLang.nativeName}</Text>
             </TouchableOpacity>
 
-            <View style={styles.roleBadge}>
-              <Text style={styles.roleBadgeText}>{roleTitles[userRole]}</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.profileIconButton}
+              activeOpacity={0.7}
+              onPress={() => setShowProfileModal(true)}
+            >
+              <Text style={styles.profileIconText}>👤</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.signOutIconButton}
@@ -175,6 +174,12 @@ export const DashboardScreen: React.FC = () => {
         visible={showLanguageModal}
         onClose={() => setShowLanguageModal(false)}
       />
+
+      {/* Profile Details Modal */}
+      <ProfileModal
+        visible={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </View>
   );
 };
@@ -212,6 +217,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: colors.textPrimary,
+  },
+  profileIconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileIconText: {
+    fontSize: 16,
   },
   signOutIconButton: {
     width: 36,
