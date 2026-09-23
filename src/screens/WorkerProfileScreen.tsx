@@ -74,8 +74,8 @@ export const WorkerProfileScreen: React.FC = () => {
                 <Text style={styles.backButtonText}>← {t.back}</Text>
               </TouchableOpacity>
             )}
-            <Text style={styles.tag}>SCREENING WORKER</Text>
-            <Text style={styles.title}>Set up your screening profile</Text>
+            <Text style={styles.tag}>HEALTHCARE FIELD WORKER</Text>
+            <Text style={styles.title}>Set up your profile</Text>
           </View>
 
           {/* Form */}

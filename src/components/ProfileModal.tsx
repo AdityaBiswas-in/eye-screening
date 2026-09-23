@@ -35,7 +35,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     userRole === 'patient'
       ? 'Patient'
       : userRole === 'worker'
-      ? 'Screening Worker'
+      ? 'Healthcare Field Worker'
       : 'Doctor';
 
   const name =

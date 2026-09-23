@@ -71,7 +71,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
     howWillYouUse: 'How will you use RetinaCare?',
     patientTitle: 'Patient',
     patientDesc: 'View screenings, results and reports.',
-    workerTitle: 'Screening Worker',
+    workerTitle: 'Healthcare Field Worker',
     workerDesc: 'Capture retinal images and submit screenings.',
     doctorTitle: 'Doctor',
     doctorDesc: 'Review AI-assisted screenings and clinical evidence.',
