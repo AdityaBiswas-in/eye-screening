@@ -18,7 +18,7 @@ import { ProfileModal } from '../components/ProfileModal';
 import { LANGUAGES } from '../i18n/translations';
 
 export const WorkerDashboardScreen: React.FC = () => {
-  const { navigate, screenings, addScreening, signOut, language } = useApp();
+  const { navigate, screenings, addScreening, signOut, language, viewReport } = useApp();
   const [showScanModal, setShowScanModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -170,7 +170,7 @@ export const WorkerDashboardScreen: React.FC = () => {
           {screenings.length > 0 && (
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => Alert.alert('All Screenings', `${screenings.length} total screening(s) recorded.`)}
+              onPress={() => navigate('screeningHistory')}
             >
               <Text style={styles.viewAllText}>View all</Text>
             </TouchableOpacity>
@@ -200,12 +200,7 @@ export const WorkerDashboardScreen: React.FC = () => {
                 key={item.id}
                 style={styles.patientCard}
                 activeOpacity={0.8}
-                onPress={() =>
-                  Alert.alert(
-                    item.name,
-                    `Age: ${item.age}\nDate: ${item.date}\nDiagnosis: ${item.condition}\nStatus: ${item.status}`
-                  )
-                }
+                onPress={() => viewReport(item)}
               >
                 {/* Initials Avatar */}
                 <View style={styles.initialsBox}>
