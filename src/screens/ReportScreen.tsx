@@ -95,6 +95,9 @@ export const ReportScreen: React.FC = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedView, setSelectedView] = useState<ModalityType>('gradcam');
   const [showViewerModal, setShowViewerModal] = useState(false);
+  const [doctorSigned, setDoctorSigned] = useState(false);
+  const [showOverrideModal, setShowOverrideModal] = useState(false);
+  const [decisionMessage, setDecisionMessage] = useState('');
 
   // If active record not set, fallback to the latest screening or null
   const record: ScreeningRecord | null =
@@ -590,42 +593,34 @@ export const ReportScreen: React.FC = () => {
             </View>
 
             <TouchableOpacity
-              style={styles.doctorConfirmBtn}
+              style={[
+                styles.doctorConfirmBtn,
+                doctorSigned && { backgroundColor: '#15803d' },
+              ]}
               activeOpacity={0.85}
-              onPress={() =>
-                Alert.alert(
-                  'Endorse & Sign Report',
-                  `You have verified and confirmed the DR assessment for ${patientName} (${status}). Report signed digitally.`,
-                  [{ text: 'Done', onPress: () => goBack() }]
-                )
-              }
+              onPress={() => {
+                setDoctorSigned(true);
+                setDecisionMessage(`Report verified & digitally endorsed by Doctor for ${patientName}.`);
+              }}
             >
-              <Text style={styles.doctorConfirmBtnText}>✓ Confirm & Sign Result</Text>
+              <Text style={styles.doctorConfirmBtnText}>
+                {doctorSigned ? '✓ Endorsed & Signed by Doctor' : '✓ Confirm & Sign Result'}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.doctorOverrideBtn}
               activeOpacity={0.85}
-              onPress={() =>
-                Alert.alert(
-                  'Override AI Assessment',
-                  `Select revised clinical diagnosis for ${patientName}:`,
-                  [
-                    {
-                      text: 'Mark as Normal / No DR',
-                      onPress: () => Alert.alert('Overridden', 'Marked as No DR.'),
-                    },
-                    {
-                      text: 'Mark as Urgent Referral',
-                      onPress: () => Alert.alert('Urgent Referral', 'Marked for urgent specialist intervention.'),
-                    },
-                    { text: 'Cancel', style: 'cancel' },
-                  ]
-                )
-              }
+              onPress={() => setShowOverrideModal(true)}
             >
               <Text style={styles.doctorOverrideBtnText}>✎ Override Result / Clinical Revision</Text>
             </TouchableOpacity>
+
+            {decisionMessage ? (
+              <View style={styles.doctorDecisionFeedbackBox}>
+                <Text style={styles.doctorDecisionFeedbackText}>{decisionMessage}</Text>
+              </View>
+            ) : null}
           </View>
         )}
       </ScrollView>
@@ -635,6 +630,79 @@ export const ReportScreen: React.FC = () => {
         visible={showProfileModal}
         onClose={() => setShowProfileModal(false)}
       />
+
+      {/* Doctor Clinical Override Modal */}
+      <Modal
+        visible={showOverrideModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowOverrideModal(false)}
+      >
+        <View style={styles.overrideModalBackdrop}>
+          <View style={styles.overrideModalCard}>
+            <View style={styles.overrideModalHeader}>
+              <Text style={styles.overrideModalTitle}>Clinical Diagnosis Override</Text>
+              <TouchableOpacity
+                onPress={() => setShowOverrideModal(false)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Text style={styles.overrideModalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.overrideModalSubtitle}>
+              Revise clinical staging for patient {patientName} captured by healthcare field worker:
+            </Text>
+
+            <TouchableOpacity
+              style={styles.overrideOptionBtn}
+              activeOpacity={0.75}
+              onPress={() => {
+                setDoctorSigned(true);
+                setDecisionMessage('Overridden to: No DR / Healthy Retina (Re-screen in 12 months).');
+                setShowOverrideModal(false);
+              }}
+            >
+              <Text style={styles.overrideOptionTitle}>🟢 No DR / Normal (Clinically Insignificant)</Text>
+              <Text style={styles.overrideOptionSub}>No microaneurysms, vessels clear. Routine 1-year follow-up.</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.overrideOptionBtn}
+              activeOpacity={0.75}
+              onPress={() => {
+                setDoctorSigned(true);
+                setDecisionMessage('Overridden to: Mild Non-Proliferative DR (Follow-up 6 months).');
+                setShowOverrideModal(false);
+              }}
+            >
+              <Text style={styles.overrideOptionTitle}>🟡 Mild NPDR (Microaneurysms Only)</Text>
+              <Text style={styles.overrideOptionSub}>Strict glycemic control & primary care review within 6 months.</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.overrideOptionBtn, styles.overrideOptionBtnUrgent]}
+              activeOpacity={0.75}
+              onPress={() => {
+                setDoctorSigned(true);
+                setDecisionMessage('Overridden to: Severe DR / Urgent Tertiary Referral Required.');
+                setShowOverrideModal(false);
+              }}
+            >
+              <Text style={[styles.overrideOptionTitle, { color: '#dc2626' }]}>
+                🔴 Severe DR / Clinically Significant Macular Edema
+              </Text>
+              <Text style={styles.overrideOptionSub}>Immediate laser photocoagulation or anti-VEGF referral.</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.overrideCancelBtn}
+              onPress={() => setShowOverrideModal(false)}
+            >
+              <Text style={styles.overrideCancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* FULL-SCREEN RETINAL MULTI-ANGLE & THERMAL INSPECTION MODAL */}
       <Modal
@@ -2219,5 +2287,95 @@ const styles = StyleSheet.create({
     color: '#4b5563',
     fontSize: 13,
     fontWeight: '700',
+  },
+  doctorDecisionFeedbackBox: {
+    marginTop: 12,
+    backgroundColor: '#f0fdf4',
+    borderWidth: 1,
+    borderColor: '#86efac',
+    borderRadius: 12,
+    padding: 10,
+    alignItems: 'center',
+  },
+  doctorDecisionFeedbackText: {
+    color: '#15803d',
+    fontSize: 12.5,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  overrideModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  overrideModalCard: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  overrideModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  overrideModalTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: colors.textPrimary,
+  },
+  overrideModalClose: {
+    fontSize: 18,
+    color: '#64748b',
+    fontWeight: '700',
+    padding: 4,
+  },
+  overrideModalSubtitle: {
+    fontSize: 12.5,
+    color: '#64748b',
+    marginBottom: 16,
+    lineHeight: 18,
+  },
+  overrideOptionBtn: {
+    backgroundColor: '#f8fafc',
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+    borderRadius: 14,
+    padding: 13,
+    marginBottom: 10,
+  },
+  overrideOptionBtnUrgent: {
+    backgroundColor: '#fef2f2',
+    borderColor: '#fca5a5',
+  },
+  overrideOptionTitle: {
+    fontSize: 13.5,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: 3,
+  },
+  overrideOptionSub: {
+    fontSize: 11,
+    color: colors.textMuted,
+  },
+  overrideCancelBtn: {
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 6,
+  },
+  overrideCancelBtnText: {
+    color: '#64748b',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

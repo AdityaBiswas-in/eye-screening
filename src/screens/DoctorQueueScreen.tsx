@@ -71,13 +71,15 @@ export const DoctorQueueScreen: React.FC = () => {
         ) : (
           <View style={styles.queueList}>
             {screenings.map((item) => (
-              <TouchableOpacity
+              <View
                 key={item.id}
                 style={styles.queueCard}
-                activeOpacity={0.85}
-                onPress={() => handleOpenReport(item)}
               >
-                <View style={styles.cardMainRow}>
+                <TouchableOpacity
+                  style={styles.cardMainRow}
+                  activeOpacity={0.7}
+                  onPress={() => handleOpenReport(item)}
+                >
                   {/* Initials Avatar */}
                   <View
                     style={[
@@ -122,7 +124,7 @@ export const DoctorQueueScreen: React.FC = () => {
                       </Text>
                     </View>
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 {/* Sub-row with AI Confidence, Quality & Worker Tag */}
                 <View style={styles.metaRow}>
@@ -138,7 +140,7 @@ export const DoctorQueueScreen: React.FC = () => {
                 <View style={styles.cardActionRow}>
                   <TouchableOpacity
                     style={styles.viewReportActionBtn}
-                    activeOpacity={0.8}
+                    activeOpacity={0.75}
                     onPress={() => handleOpenReport(item)}
                   >
                     <Text style={styles.viewReportActionBtnText}>
@@ -148,13 +150,13 @@ export const DoctorQueueScreen: React.FC = () => {
 
                   <TouchableOpacity
                     style={styles.quickReviewBtn}
-                    activeOpacity={0.8}
+                    activeOpacity={0.75}
                     onPress={() => handleReviewCase(item)}
                   >
                     <Text style={styles.quickReviewBtnText}>⚡ Quick Actions</Text>
                   </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
         )}
