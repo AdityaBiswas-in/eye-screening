@@ -65,54 +65,82 @@ export const QualityCheckScreen: React.FC = () => {
     runAiAnalysis(patientFullName.trim(), patientAge.trim() || '—');
   };
 
+  // Step-by-step progress tracking for the 'Analyzing retina' screen
+  const [analysisStep, setAnalysisStep] = useState<number>(0);
+  const [savedTargetName, setSavedTargetName] = useState<string>('');
+  const [savedTargetAge, setSavedTargetAge] = useState<string>('');
+
+  const finishAnalysis = (targetName: string, targetAge: string) => {
+    const patientName = targetName || 'Screening Patient';
+
+    const initials =
+      patientName
+        .trim()
+        .split(' ')
+        .map((p) => p[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase() || 'SP';
+
+    const newRecord: ScreeningRecord = {
+      id: Date.now().toString(),
+      initials,
+      name: patientName,
+      date: 'Today',
+      age: targetAge || '—',
+      condition: 'No DR (Mild Background)',
+      status: 'NON-REFERABLE',
+      drGrade: 'No DR (Mild Background)',
+      aiConfidence: 94,
+      imageQuality: 'Good',
+      imageQualityStatus: 'done',
+      recommendation:
+        'Routine annual dilated retinal screening advised. Maintain healthy glycemic and blood pressure parameters.',
+      evidence: [
+        { name: 'Microaneurysm-like regions', level: 'None', color: 'green' },
+        { name: 'Hemorrhage-like regions', level: 'None', color: 'green' },
+        { name: 'Hard exudate-like regions', level: 'Low', color: 'green' },
+      ],
+      recommendedDoctor: {
+        name: 'Dr. Sarah Jenkins, MD',
+        specialty: 'Retina Specialist & Vitreoretinal Surgeon',
+        hospital: 'Apex Eye Institute & Research Hospital',
+        contact: '+91 98765 43210',
+        timeframe: 'Annual routine screening (12 months)',
+      },
+    };
+
+    addScreening(newRecord);
+    setActiveReportRecord(newRecord);
+    setIsAnalyzing(false);
+    setAnalysisComplete(true);
+  };
+
   const runAiAnalysis = (targetName: string, targetAge: string) => {
+    setSavedTargetName(targetName);
+    setSavedTargetAge(targetAge);
     setIsAnalyzing(true);
+    setAnalysisStep(1); // Checking image
+
     setTimeout(() => {
-      setIsAnalyzing(false);
+      setAnalysisStep(2); // Analyzing retina
+    }, 900);
 
-      const patientName = targetName || 'Screening Patient';
+    setTimeout(() => {
+      setAnalysisStep(3); // Looking for signs of diabetic retinopathy
+    }, 1800);
 
-      const initials =
-        patientName
-          .trim()
-          .split(' ')
-          .map((p) => p[0])
-          .join('')
-          .substring(0, 2)
-          .toUpperCase() || 'SP';
+    setTimeout(() => {
+      setAnalysisStep(4); // Preparing result
+    }, 2700);
 
-      const newRecord: ScreeningRecord = {
-        id: Date.now().toString(),
-        initials,
-        name: patientName,
-        date: 'Today',
-        age: targetAge || '—',
-        condition: 'No DR (Mild Background)',
-        status: 'NON-REFERABLE',
-        drGrade: 'No DR (Mild Background)',
-        aiConfidence: 94,
-        imageQuality: 'Good',
-        imageQualityStatus: 'done',
-        recommendation:
-          'Routine annual dilated retinal screening advised. Maintain healthy glycemic and blood pressure parameters.',
-        evidence: [
-          { name: 'Microaneurysm-like regions', level: 'None', color: 'green' },
-          { name: 'Hemorrhage-like regions', level: 'None', color: 'green' },
-          { name: 'Hard exudate-like regions', level: 'Low', color: 'green' },
-        ],
-        recommendedDoctor: {
-          name: 'Dr. Sarah Jenkins, MD',
-          specialty: 'Retina Specialist & Vitreoretinal Surgeon',
-          hospital: 'Apex Eye Institute & Research Hospital',
-          contact: '+91 98765 43210',
-          timeframe: 'Annual routine screening (12 months)',
-        },
-      };
+    setTimeout(() => {
+      finishAnalysis(targetName, targetAge);
+    }, 3600);
+  };
 
-      addScreening(newRecord);
-      setActiveReportRecord(newRecord);
-      setAnalysisComplete(true);
-    }, 1200);
+  const handleSkipAnalysis = () => {
+    finishAnalysis(savedTargetName, savedTargetAge);
   };
 
   return (
@@ -358,6 +386,136 @@ export const QualityCheckScreen: React.FC = () => {
               </ScrollView>
             </View>
           </KeyboardAvoidingView>
+        </View>
+      )}
+
+      {/* 'Analyzing retina' Screen (Dark HUD Fullscreen Overlay) */}
+      {isAnalyzing && (
+        <View style={styles.analyzingOverlay}>
+          {/* Subtle background fundus watermark */}
+          <View style={styles.watermarkContainer}>
+            <Image
+              source={require('../../assets/fundus_sample.jpg')}
+              style={styles.watermarkImage}
+              resizeMode="cover"
+            />
+          </View>
+
+          {/* Central Target / Reticle Graphic */}
+          <View style={styles.analyzingCenterContent}>
+            <View style={styles.reticleBadgeOuter}>
+              <View style={styles.reticleBadgeInner}>
+                <Text style={styles.reticleIcon}>🎯</Text>
+              </View>
+            </View>
+
+            <Text style={styles.analyzingMainTitle}>Analyzing retina</Text>
+            <Text style={styles.analyzingSubtitle}>Analyzing retinal features</Text>
+
+            {/* Checklist of steps */}
+            <View style={styles.stepsContainer}>
+              {/* Step 1: Checking image */}
+              <View style={styles.stepRow}>
+                <View
+                  style={[
+                    styles.stepCheckCircle,
+                    analysisStep >= 1 ? styles.stepCheckCircleActive : styles.stepCheckCircleInactive,
+                  ]}
+                >
+                  <Text style={styles.stepCheckIcon}>✓</Text>
+                </View>
+                <Text
+                  style={[
+                    styles.stepLabel,
+                    analysisStep >= 1 ? styles.stepLabelActive : styles.stepLabelInactive,
+                  ]}
+                >
+                  Checking image
+                </Text>
+                {analysisStep >= 1 && <Text style={styles.stepStatusTick}>✓</Text>}
+              </View>
+
+              {/* Step 2: Analyzing retina */}
+              <View style={styles.stepRow}>
+                <View
+                  style={[
+                    styles.stepCheckCircle,
+                    analysisStep >= 2 ? styles.stepCheckCircleActive : styles.stepCheckCircleInactive,
+                  ]}
+                >
+                  <Text style={styles.stepCheckIcon}>✓</Text>
+                </View>
+                <Text
+                  style={[
+                    styles.stepLabel,
+                    analysisStep >= 2 ? styles.stepLabelActive : styles.stepLabelInactive,
+                  ]}
+                >
+                  Analyzing retina
+                </Text>
+                {analysisStep >= 2 && <Text style={styles.stepStatusTick}>✓</Text>}
+              </View>
+
+              {/* Step 3: Looking for signs of diabetic retinopathy */}
+              <View style={styles.stepRow}>
+                <View
+                  style={[
+                    styles.stepCheckCircle,
+                    analysisStep >= 3 ? styles.stepCheckCircleActive : styles.stepCheckCircleInactive,
+                  ]}
+                >
+                  <Text style={styles.stepCheckIcon}>✓</Text>
+                </View>
+                <Text
+                  style={[
+                    styles.stepLabel,
+                    analysisStep >= 3 ? styles.stepLabelActive : styles.stepLabelInactive,
+                  ]}
+                >
+                  Looking for signs of diabetic{'\n'}retinopathy
+                </Text>
+                {analysisStep >= 3 && <Text style={styles.stepStatusTick}>✓</Text>}
+              </View>
+
+              {/* Step 4: Preparing result */}
+              <View style={styles.stepRow}>
+                <View
+                  style={[
+                    styles.stepCheckCircle,
+                    analysisStep >= 4 ? styles.stepCheckCircleActive : styles.stepCheckCircleInactive,
+                  ]}
+                >
+                  <Text style={styles.stepCheckIcon}>✓</Text>
+                </View>
+                <Text
+                  style={[
+                    styles.stepLabel,
+                    analysisStep >= 4
+                      ? styles.stepLabelActive
+                      : analysisStep === 3
+                      ? styles.stepLabelInProgress
+                      : styles.stepLabelInactive,
+                  ]}
+                >
+                  Preparing result
+                </Text>
+                {analysisStep >= 4 ? (
+                  <Text style={styles.stepStatusTick}>✓</Text>
+                ) : analysisStep === 3 ? (
+                  <Text style={styles.stepStatusProgress}>...</Text>
+                ) : null}
+              </View>
+            </View>
+
+            {/* Skip to result link */}
+            <TouchableOpacity
+              style={styles.skipButton}
+              activeOpacity={0.7}
+              onPress={handleSkipAnalysis}
+            >
+              <Text style={styles.skipButtonText}>Skip to result</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
 
@@ -877,5 +1035,148 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '700',
     fontSize: 15,
+  },
+  // 'Analyzing retina' Fullscreen HUD styles
+  analyzingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#090e17',
+    zIndex: 99999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  watermarkContainer: {
+    position: 'absolute',
+    top: '18%',
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    opacity: 0.08,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  watermarkImage: {
+    width: '100%',
+    height: '100%',
+  },
+  analyzingCenterContent: {
+    width: '100%',
+    maxWidth: 320,
+    alignItems: 'center',
+  },
+  reticleBadgeOuter: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: 'rgba(13, 148, 136, 0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 26,
+    borderWidth: 1,
+    borderColor: 'rgba(20, 184, 166, 0.3)',
+  },
+  reticleBadgeInner: {
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    backgroundColor: '#0d9488',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#14b8a6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+  },
+  reticleIcon: {
+    fontSize: 28,
+  },
+  analyzingMainTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#ffffff',
+    letterSpacing: -0.3,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  analyzingSubtitle: {
+    fontSize: 14.5,
+    color: '#64748b',
+    fontWeight: '500',
+    marginBottom: 36,
+    textAlign: 'center',
+  },
+  stepsContainer: {
+    width: '100%',
+    marginBottom: 44,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  stepCheckCircle: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  stepCheckCircleActive: {
+    backgroundColor: '#10b981',
+  },
+  stepCheckCircleInactive: {
+    backgroundColor: '#1e293b',
+  },
+  stepCheckIcon: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  stepLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    lineHeight: 20,
+  },
+  stepLabelActive: {
+    color: '#f8fafc',
+  },
+  stepLabelInProgress: {
+    color: '#38bdf8',
+    fontWeight: '700',
+  },
+  stepLabelInactive: {
+    color: '#475569',
+  },
+  stepStatusTick: {
+    fontSize: 14,
+    color: '#64748b',
+    fontWeight: '700',
+    marginLeft: 8,
+  },
+  stepStatusProgress: {
+    fontSize: 16,
+    color: '#38bdf8',
+    fontWeight: '900',
+    letterSpacing: 2,
+    marginLeft: 8,
+  },
+  skipButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  skipButtonText: {
+    color: '#64748b',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+    fontWeight: '600',
   },
 });
