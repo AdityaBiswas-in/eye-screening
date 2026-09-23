@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   historyBtn: {
-    backgroundColor: '#e6f4f5',
+    backgroundColor: colors.primaryMuted,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 14,
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#e6f4f5',
+    backgroundColor: colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   progressReferable: {
-    backgroundColor: '#0d9488',
+    backgroundColor: colors.primary,
   },
   progressNonReferable: {
     backgroundColor: '#10b981',
@@ -833,7 +833,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#e6f4f5',
+    backgroundColor: colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,

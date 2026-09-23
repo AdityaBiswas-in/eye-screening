@@ -286,8 +286,8 @@ const styles = StyleSheet.create({
     cursor: 'pointer' as any,
   },
   torchPillActive: {
-    borderColor: '#0d9488',
-    backgroundColor: 'rgba(13, 148, 136, 0.25)',
+    borderColor: '#3b82f6',
+    backgroundColor: 'rgba(37, 99, 235, 0.25)',
   },
   torchText: {
     color: '#ffffff',
@@ -326,14 +326,14 @@ const styles = StyleSheet.create({
     height: 250,
     borderRadius: 125,
     borderWidth: 2,
-    borderColor: '#0d9488',
+    borderColor: '#3b82f6',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
   crosshairTick: {
     position: 'absolute',
-    backgroundColor: '#14b8a6',
+    backgroundColor: '#60a5fa',
   },
   tickTop: {
     width: 2,

@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: '#095d61', // Selected/Focused border from screenshot
+    borderColor: colors.primary,
     paddingHorizontal: 16,
     fontSize: 16,
     fontWeight: '500',
