@@ -15,15 +15,7 @@ export const EyeCameraScreen: React.FC = () => {
 
   const [selectedEye, setSelectedEye] = useState<'LEFT EYE (OS)' | 'RIGHT EYE (OD)'>('LEFT EYE (OS)');
   const [torchOn, setTorchOn] = useState(true);
-  const [countdown, setCountdown] = useState(1.5);
   const [isCapturing, setIsCapturing] = useState(false);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => (prev > 0.5 ? Number((prev - 0.1).toFixed(1)) : 1.5));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Pulse animation for fixation red dot
   const [pulseAnim] = useState(new Animated.Value(1));
@@ -85,13 +77,24 @@ export const EyeCameraScreen: React.FC = () => {
     <View style={styles.container}>
       {/* Top Header Bar */}
       <View style={styles.topHeader}>
-        <TouchableOpacity
-          style={styles.eyeTogglePill}
-          activeOpacity={0.8}
-          onPress={handleToggleEye}
-        >
-          <Text style={styles.eyeToggleText}>{selectedEye}</Text>
-        </TouchableOpacity>
+        <View style={styles.topLeftActions}>
+          <TouchableOpacity
+            style={styles.backButton}
+            activeOpacity={0.7}
+            onPress={handleExit}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+          >
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.eyeTogglePill}
+            activeOpacity={0.8}
+            onPress={handleToggleEye}
+          >
+            <Text style={styles.eyeToggleText}>{selectedEye}</Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.topRightActions}>
           <TouchableOpacity
@@ -100,7 +103,7 @@ export const EyeCameraScreen: React.FC = () => {
             onPress={() => setTorchOn((prev) => !prev)}
           >
             <Text style={styles.torchText}>
-              {torchOn ? '💡 TORCH ON' : '🔦 TORCH OFF'}
+              {torchOn ? '💡 TORCH' : '🔦 OFF'}
             </Text>
           </TouchableOpacity>
 
@@ -108,6 +111,7 @@ export const EyeCameraScreen: React.FC = () => {
             style={styles.closeButton}
             activeOpacity={0.7}
             onPress={handleExit}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
           >
             <Text style={styles.closeIcon}>✕</Text>
           </TouchableOpacity>
@@ -156,7 +160,7 @@ export const EyeCameraScreen: React.FC = () => {
             <Text style={styles.stabilityText}>Stability: Excellent</Text>
           </View>
           <Text style={styles.autoCaptureText}>
-            Auto-capture in {countdown.toFixed(1)}s
+            Auto-capture: Active
           </Text>
         </View>
 
@@ -212,13 +216,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 54,
-    zIndex: 10,
+    position: 'relative',
+    zIndex: 999,
+  },
+  topLeftActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    position: 'relative',
+    zIndex: 999,
+  },
+  backButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+    borderWidth: 1.2,
+    borderColor: '#334155',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backIcon: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: '700',
+    marginTop: -2,
   },
   eyeTogglePill: {
     backgroundColor: 'rgba(15, 23, 42, 0.85)',
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 20,
     borderWidth: 1,
@@ -226,7 +254,7 @@ const styles = StyleSheet.create({
   },
   eyeToggleText: {
     color: '#ffffff',
-    fontSize: 12.5,
+    fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.8,
   },
@@ -234,10 +262,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    position: 'relative',
+    zIndex: 999,
   },
   torchPill: {
     backgroundColor: 'rgba(15, 23, 42, 0.85)',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 9,
     borderRadius: 20,
     borderWidth: 1,
@@ -249,23 +279,23 @@ const styles = StyleSheet.create({
   },
   torchText: {
     color: '#ffffff',
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
   closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(15, 23, 42, 0.85)',
-    borderWidth: 1,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+    borderWidth: 1.2,
     borderColor: '#334155',
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeIcon: {
-    color: '#94a3b8',
-    fontSize: 14,
+    color: '#ffffff',
+    fontSize: 15,
     fontWeight: '700',
   },
   viewfinder: {
