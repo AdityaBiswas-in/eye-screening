@@ -381,7 +381,7 @@ export const QualityCheckScreen: React.FC = () => {
                   activeOpacity={0.85}
                   onPress={handleSubmitPatientDetails}
                 >
-                  <Text style={styles.submitAnalysisBtnText}>⚡ Run AI Analysis & Report</Text>
+                  <Text style={styles.submitAnalysisBtnText}>Analyse</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
