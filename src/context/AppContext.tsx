@@ -77,8 +77,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const goBack = () => {
     setScreenStack((prev) => {
-      if (prev.length <= 1) return prev;
-      return prev.slice(0, -1);
+      if (prev.length > 1) {
+        return prev.slice(0, -1);
+      }
+      // If stack is at root, return to role dashboard
+      if (userRole === 'doctor') return ['doctorDashboard'];
+      if (userRole === 'worker') return ['workerDashboard'];
+      return ['dashboard'];
     });
   };
 

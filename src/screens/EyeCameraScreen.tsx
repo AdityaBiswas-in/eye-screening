@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   Alert,
   Animated,
 } from 'react-native';
@@ -54,13 +55,17 @@ export const EyeCameraScreen: React.FC = () => {
   };
 
   const handleExit = () => {
-    if (canGoBack) {
-      goBack();
-    } else if (userRole === 'doctor') {
-      navigate('doctorDashboard');
-    } else if (userRole === 'worker') {
-      navigate('workerDashboard');
-    } else {
+    try {
+      if (canGoBack) {
+        goBack();
+      } else if (userRole === 'doctor') {
+        navigate('doctorDashboard');
+      } else if (userRole === 'worker') {
+        navigate('workerDashboard');
+      } else {
+        navigate('dashboard');
+      }
+    } catch {
       navigate('dashboard');
     }
   };
@@ -78,14 +83,16 @@ export const EyeCameraScreen: React.FC = () => {
       {/* Top Header Bar */}
       <View style={styles.topHeader}>
         <View style={styles.topLeftActions}>
-          <TouchableOpacity
-            style={styles.backButton}
-            activeOpacity={0.7}
+          <Pressable
+            style={({ pressed }) => [
+              styles.backButton,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={handleExit}
-            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+            hitSlop={15}
           >
             <Text style={styles.backIcon}>←</Text>
-          </TouchableOpacity>
+          </Pressable>
 
           <TouchableOpacity
             style={styles.eyeTogglePill}
@@ -107,14 +114,16 @@ export const EyeCameraScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.closeButton}
-            activeOpacity={0.7}
+          <Pressable
+            style={({ pressed }) => [
+              styles.closeButton,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={handleExit}
-            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+            hitSlop={15}
           >
             <Text style={styles.closeIcon}>✕</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 
@@ -237,6 +246,7 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
     alignItems: 'center',
     justifyContent: 'center',
+    cursor: 'pointer' as any,
   },
   backIcon: {
     color: '#ffffff',
@@ -251,6 +261,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#334155',
+    cursor: 'pointer' as any,
   },
   eyeToggleText: {
     color: '#ffffff',
@@ -272,6 +283,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#334155',
+    cursor: 'pointer' as any,
   },
   torchPillActive: {
     borderColor: '#0d9488',
@@ -292,6 +304,7 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
     alignItems: 'center',
     justifyContent: 'center',
+    cursor: 'pointer' as any,
   },
   closeIcon: {
     color: '#ffffff',
