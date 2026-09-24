@@ -177,24 +177,48 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const prevPhoneRef = React.useRef(account.phoneNumber);
+
   const updateAccount = (updates: Partial<UserAccount>) => {
-    setAccount((prev) => ({ ...prev, ...updates }));
+    setAccount((prev) => {
+      const next = { ...prev, ...updates };
+      if (updates.phoneNumber !== undefined && updates.phoneNumber !== prev.phoneNumber) {
+        setPatientProfile((p) => ({ ...p, phoneNumber: updates.phoneNumber! }));
+        setWorkerProfile((w) => ({ ...w, phoneNumber: updates.phoneNumber! }));
+        setDoctorProfile((d) => ({ ...d, phoneNumber: updates.phoneNumber! }));
+      }
+      return next;
+    });
   };
 
   const updatePatientProfile = (updates: Partial<PatientProfile>) => {
     setPatientProfile((prev) => {
-      // Auto-generate a patientId the first time if not already set
       const patientId = prev.patientId || generatePatientId();
       return { ...prev, ...updates, patientId };
     });
+    if (updates.phoneNumber !== undefined) {
+      setAccount((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+      setWorkerProfile((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+      setDoctorProfile((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+    }
   };
 
   const updateWorkerProfile = (updates: Partial<WorkerProfile>) => {
     setWorkerProfile((prev) => ({ ...prev, ...updates }));
+    if (updates.phoneNumber !== undefined) {
+      setAccount((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+      setPatientProfile((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+      setDoctorProfile((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+    }
   };
 
   const updateDoctorProfile = (updates: Partial<DoctorProfile>) => {
     setDoctorProfile((prev) => ({ ...prev, ...updates }));
+    if (updates.phoneNumber !== undefined) {
+      setAccount((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+      setPatientProfile((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+      setWorkerProfile((prev) => ({ ...prev, phoneNumber: updates.phoneNumber! }));
+    }
   };
 
   const addScreening = (record: ScreeningRecord) => {
@@ -245,6 +269,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (isRestoring || !account.fullName.trim() || !account.phoneNumber.trim()) return;
 
+    const oldPhone = prevPhoneRef.current;
+    prevPhoneRef.current = account.phoneNumber;
+
     const savedAccount: SavedAccount = {
       account,
       userRole,
@@ -254,8 +281,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
     readSavedAccounts()
       .then((accounts) => {
+        // Match by new phone OR old phone if user updated their phone number
         const accountIndex = accounts.findIndex(
-          (item) => item.account.phoneNumber === account.phoneNumber && item.userRole === userRole,
+          (item) =>
+            (item.account.phoneNumber === account.phoneNumber || (oldPhone && item.account.phoneNumber === oldPhone)) &&
+            item.userRole === userRole,
         );
         const updatedAccounts = [...accounts];
         if (accountIndex >= 0) updatedAccounts[accountIndex] = savedAccount;
@@ -263,7 +293,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return saveLocally(JSON.stringify({ accounts: updatedAccounts } satisfies SavedAccountsStore));
       })
       .catch(() => {
-      // The account remains usable for this session if local storage is unavailable.
+        // The account remains usable for this session if local storage is unavailable.
       });
   }, [account, doctorProfile, isRestoring, patientProfile, userRole, workerProfile]);
 
