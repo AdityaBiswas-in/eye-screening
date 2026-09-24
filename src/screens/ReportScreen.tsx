@@ -813,209 +813,217 @@ export const ReportScreen: React.FC = () => {
       <Modal
         visible={showViewerModal}
         animationType="slide"
-        transparent={false}
+        transparent={Platform.OS === 'web'}
         onRequestClose={() => setShowViewerModal(false)}
       >
-        <View style={styles.modalContainer}>
-          {/* Modal Header */}
-          <View style={styles.modalHeader}>
-            <TouchableOpacity
-              style={styles.modalCloseBtn}
-              activeOpacity={0.7}
-              onPress={() => setShowViewerModal(false)}
-            >
-              <Ionicons name="close" size={18} color="#ffffff" style={{ marginRight: 4 }} />
-              <Text style={styles.modalCloseBtnText}>Close</Text>
-            </TouchableOpacity>
+        <View style={styles.modalRootOverlay}>
+          <View style={styles.modalDeviceContainer}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <TouchableOpacity
+                style={styles.modalCloseBtn}
+                activeOpacity={0.7}
+                onPress={() => setShowViewerModal(false)}
+              >
+                <Ionicons name="close" size={20} color="#ffffff" style={{ marginRight: 4 }} />
+                <Text style={styles.modalCloseBtnText}>Close</Text>
+              </TouchableOpacity>
 
-            <View style={styles.modalHeaderCenter}>
-              <Text style={styles.modalHeaderTitle}>Retinal Diagnostic Viewer</Text>
-              <Text style={styles.modalHeaderSub}>
-                ID: {record?.id ? record.id.slice(-6) : 'REC-01'} · High-Resolution Multi-Spectrum
-              </Text>
-            </View>
-
-            <View style={styles.modalBadge}>
-              <Text style={styles.modalBadgeText}>{imageQuality}</Text>
-            </View>
-          </View>
-
-          <ScrollView
-            style={styles.modalScroll}
-            contentContainerStyle={styles.modalScrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Active Modality Title Banner */}
-            <View style={styles.modalActiveBanner}>
-              <View style={styles.modalActiveBannerLeft}>
-                <View style={styles.modalActiveBannerIconBox}>
-                  {renderModalityIcon(activeModality, 24, '#38bdf8')}
-                </View>
-                <View>
-                  <Text style={styles.modalActiveBannerTitle}>{activeModality.name}</Text>
-                  <Text style={styles.modalActiveBannerTag}>{activeModality.badge}</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Giant Full-Spectrum Retinal Image Canvas */}
-            <View style={styles.modalRetinaFrame}>
-              <Image
-                source={retinaSource}
-                style={[
-                  styles.modalRetinaImage,
-                  selectedView === 'thermal' && styles.imageFilterThermal,
-                  selectedView === 'redfree' && styles.imageFilterRedFree,
-                  selectedView === 'vessels' && styles.imageFilterVessels,
-                ]}
-                resizeMode="contain"
-              />
-
-              {/* High-Res Overlays */}
-              {selectedView === 'gradcam' && (
-                <View style={styles.modalGradCamOverlay}>
-                  <View style={styles.modalHeatCircleMajor} />
-                  <View style={styles.modalHeatCircleMinor} />
-                  <View style={styles.modalHeatCircleMacula} />
-                  <View style={styles.modalLesionCrosshair}>
-                    <MaterialCommunityIcons name="target" size={14} color="#ef4444" style={{ marginRight: 4 }} />
-                    <Text style={styles.modalCrosshairText}>Lesion Cluster (Weight: 0.93)</Text>
-                  </View>
-                </View>
-              )}
-
-              {selectedView === 'thermal' && (
-                <View style={styles.modalThermalOverlay}>
-                  <View style={styles.modalThermalCore} />
-                  <View style={styles.modalThermalFocal} />
-                  <View style={styles.modalThermalVessel1} />
-                  <View style={styles.modalThermalVessel2} />
-                  <View style={styles.modalThermalScale}>
-                    <Text style={styles.modalScaleLabel}>Thermal Ischemia Gradient</Text>
-                    <View style={styles.modalScaleBar} />
-                    <View style={styles.modalScaleTicks}>
-                      <Text style={styles.modalScaleTickText}>0° (Safe)</Text>
-                      <Text style={styles.modalScaleTickText}>50° (Moderate)</Text>
-                      <Text style={styles.modalScaleTickText}>100° (Critical)</Text>
-                    </View>
-                  </View>
-                </View>
-              )}
-
-              {selectedView === 'redfree' && (
-                <View style={styles.modalRedFreeOverlay}>
-                  <View style={styles.modalRedFreeDotA} />
-                  <View style={styles.modalRedFreeDotB} />
-                  <View style={styles.modalRedFreeDotC} />
-                  <View style={styles.modalRedFreeBanner}>
-                    <MaterialCommunityIcons name="contrast" size={14} color="#34d399" style={{ marginRight: 6 }} />
-                    <Text style={styles.modalRedFreeBannerText}>
-                      Green Channel Active: Microaneurysms appear sharp black against green background
-                    </Text>
-                  </View>
-                </View>
-              )}
-
-              {selectedView === 'vessels' && (
-                <View style={styles.modalVesselsOverlay}>
-                  <View style={styles.modalVesselBranch1} />
-                  <View style={styles.modalVesselBranch2} />
-                  <View style={styles.modalVesselBanner}>
-                    <MaterialCommunityIcons name="vector-polyline" size={14} color="#38bdf8" style={{ marginRight: 6 }} />
-                    <Text style={styles.modalVesselBannerText}>
-                      Angiographic Contrast: Arteriole/Venule Caliber Ratio (A/V) = 0.67
-                    </Text>
-                  </View>
-                </View>
-              )}
-            </View>
-
-            {/* Modality Selector Pills Inside Modal */}
-            <Text style={styles.modalFilterSectionTitle}>SELECT SPECTRAL VIEW</Text>
-            <View style={styles.modalTabsRow}>
-              {VIEW_MODALITIES.map((modality) => {
-                const isSelected = selectedView === modality.id;
-                const iconColor = isSelected ? '#ffffff' : '#94a3b8';
-                return (
-                  <TouchableOpacity
-                    key={modality.id}
-                    style={[
-                      styles.modalTabChip,
-                      isSelected && styles.modalTabChipActive,
-                    ]}
-                    activeOpacity={0.75}
-                    onPress={() => setSelectedView(modality.id)}
-                  >
-                    {renderModalityIcon(modality, 16, iconColor)}
-                    <Text
-                      style={[
-                        styles.modalTabChipText,
-                        isSelected && styles.modalTabChipTextActive,
-                      ]}
-                    >
-                      {modality.tabLabel}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
-            {/* Diagnostic Clinical Findings Card */}
-            <View style={styles.modalDetailsCard}>
-              <Text style={styles.modalCardHeader}>CLINICAL INTERPRETATION</Text>
-
-              <View style={styles.modalDetailRow}>
-                <Text style={styles.modalDetailLabel}>Modality:</Text>
-                <Text style={styles.modalDetailValue}>{activeModality.name}</Text>
-              </View>
-
-              <View style={styles.modalDetailRow}>
-                <Text style={styles.modalDetailLabel}>Description:</Text>
-                <Text style={styles.modalDetailValue}>{activeModality.description}</Text>
-              </View>
-
-              <View style={styles.modalDetailRow}>
-                <Text style={styles.modalDetailLabel}>Sign Target:</Text>
-                <Text style={styles.modalDetailValue}>{activeModality.clinicalSign}</Text>
-              </View>
-
-              <View style={styles.modalDetailRow}>
-                <Text style={styles.modalDetailLabel}>AI Saliency:</Text>
-                <Text style={[styles.modalDetailValue, { color: '#059669', fontWeight: '700' }]}>
-                  {activeModality.findings}
+              <View style={styles.modalHeaderCenter}>
+                <Text style={styles.modalHeaderTitle}>Retinal Diagnostic Viewer</Text>
+                <Text style={styles.modalHeaderSub}>
+                  ID: {record?.id ? record.id.slice(-6) : 'REC-01'} · Multi-Spectrum
                 </Text>
               </View>
+
+              <View style={styles.modalBadge}>
+                <Text style={styles.modalBadgeText}>{imageQuality}</Text>
+              </View>
             </View>
 
-            {/* Evidence Checklist in Modal */}
-            <View style={styles.modalDetailsCard}>
-              <Text style={styles.modalCardHeader}>DETECTED RETINAL EVIDENCE</Text>
-              {evidence.map((item, index) => {
-                const isRed = item.color === 'red' || item.level === 'High';
-                const isAmber = item.color === 'amber' || item.level === 'Moderate';
-                const dotColor = isRed ? '#ef4444' : isAmber ? '#d97706' : '#10b981';
-
-                return (
-                  <View key={index} style={styles.modalEvidenceItem}>
-                    <View style={[styles.evidenceDot, { backgroundColor: dotColor }]} />
-                    <Text style={styles.modalEvidenceName}>{item.name}</Text>
-                    <Text style={[styles.modalEvidenceLevel, { color: dotColor }]}>
-                      {item.level}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
-
-            {/* Bottom Done Button */}
-            <TouchableOpacity
-              style={styles.modalBottomDoneBtn}
-              activeOpacity={0.85}
-              onPress={() => setShowViewerModal(false)}
+            <ScrollView
+              style={styles.modalScroll}
+              contentContainerStyle={styles.modalScrollContent}
+              showsVerticalScrollIndicator={false}
             >
-              <Text style={styles.modalBottomDoneBtnText}>Done Viewing</Text>
-            </TouchableOpacity>
-          </ScrollView>
+              {/* Active Modality Title Banner */}
+              <View style={styles.modalActiveBanner}>
+                <View style={styles.modalActiveBannerLeft}>
+                  <View style={styles.modalActiveBannerIconBox}>
+                    {renderModalityIcon(activeModality, 24, '#38bdf8')}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.modalActiveBannerTitle}>{activeModality.name}</Text>
+                    <Text style={styles.modalActiveBannerTag}>{activeModality.badge}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* High-Resolution Retinal Image Canvas */}
+              <View style={styles.modalRetinaFrame}>
+                <Image
+                  source={retinaSource}
+                  style={styles.modalRetinaImage}
+                  resizeMode="contain"
+                />
+
+                {/* Spectral Filter Overlays without blocking the image */}
+                {selectedView === 'thermal' && (
+                  <View style={styles.modalFilterThermalTint} pointerEvents="none" />
+                )}
+                {selectedView === 'redfree' && (
+                  <View style={styles.modalFilterRedFreeTint} pointerEvents="none" />
+                )}
+                {selectedView === 'vessels' && (
+                  <View style={styles.modalFilterVesselsTint} pointerEvents="none" />
+                )}
+
+                {/* High-Res Diagnostic Overlays */}
+                {selectedView === 'gradcam' && (
+                  <View style={styles.modalGradCamOverlay} pointerEvents="none">
+                    <View style={styles.modalHeatCircleMajor} />
+                    <View style={styles.modalHeatCircleMinor} />
+                    <View style={styles.modalHeatCircleMacula} />
+                    <View style={styles.modalLesionCrosshair}>
+                      <MaterialCommunityIcons name="target" size={14} color="#ef4444" style={{ marginRight: 4 }} />
+                      <Text style={styles.modalCrosshairText}>Lesion Cluster (Weight: 0.93)</Text>
+                    </View>
+                  </View>
+                )}
+
+                {selectedView === 'thermal' && (
+                  <View style={styles.modalThermalOverlay} pointerEvents="none">
+                    <View style={styles.modalThermalCore} />
+                    <View style={styles.modalThermalFocal} />
+                    <View style={styles.modalThermalVessel1} />
+                    <View style={styles.modalThermalVessel2} />
+                    <View style={styles.modalThermalScale}>
+                      <Text style={styles.modalScaleLabel}>Thermal Ischemia Gradient</Text>
+                      <View style={styles.modalScaleBar} />
+                      <View style={styles.modalScaleTicks}>
+                        <Text style={styles.modalScaleTickText}>0° (Safe)</Text>
+                        <Text style={styles.modalScaleTickText}>50° (Moderate)</Text>
+                        <Text style={styles.modalScaleTickText}>100° (Critical)</Text>
+                      </View>
+                    </View>
+                  </View>
+                )}
+
+                {selectedView === 'redfree' && (
+                  <View style={styles.modalRedFreeOverlay} pointerEvents="none">
+                    <View style={styles.modalRedFreeDotA} />
+                    <View style={styles.modalRedFreeDotB} />
+                    <View style={styles.modalRedFreeDotC} />
+                    <View style={styles.modalRedFreeBanner}>
+                      <MaterialCommunityIcons name="contrast" size={14} color="#34d399" style={{ marginRight: 6 }} />
+                      <Text style={styles.modalRedFreeBannerText}>
+                        Green Channel Active: Microaneurysms appear sharp black against green background
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                {selectedView === 'vessels' && (
+                  <View style={styles.modalVesselsOverlay} pointerEvents="none">
+                    <View style={styles.modalVesselBranch1} />
+                    <View style={styles.modalVesselBranch2} />
+                    <View style={styles.modalVesselBanner}>
+                      <MaterialCommunityIcons name="vector-polyline" size={14} color="#38bdf8" style={{ marginRight: 6 }} />
+                      <Text style={styles.modalVesselBannerText}>
+                        Angiographic Contrast: Arteriole/Venule Caliber Ratio (A/V) = 0.67
+                      </Text>
+                    </View>
+                  </View>
+                )}
+              </View>
+
+              {/* Modality Selector Pills Inside Modal */}
+              <Text style={styles.modalFilterSectionTitle}>SELECT SPECTRAL VIEW</Text>
+              <View style={styles.modalTabsRow}>
+                {VIEW_MODALITIES.map((modality) => {
+                  const isSelected = selectedView === modality.id;
+                  const iconColor = isSelected ? '#ffffff' : '#94a3b8';
+                  return (
+                    <TouchableOpacity
+                      key={modality.id}
+                      style={[
+                        styles.modalTabChip,
+                        isSelected && styles.modalTabChipActive,
+                      ]}
+                      activeOpacity={0.75}
+                      onPress={() => setSelectedView(modality.id)}
+                    >
+                      {renderModalityIcon(modality, 16, iconColor)}
+                      <Text
+                        style={[
+                          styles.modalTabChipText,
+                          isSelected && styles.modalTabChipTextActive,
+                        ]}
+                      >
+                        {modality.tabLabel}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {/* Diagnostic Clinical Findings Card */}
+              <View style={styles.modalDetailsCard}>
+                <Text style={styles.modalCardHeader}>CLINICAL INTERPRETATION</Text>
+
+                <View style={styles.modalDetailRow}>
+                  <Text style={styles.modalDetailLabel}>Modality:</Text>
+                  <Text style={styles.modalDetailValue}>{activeModality.name}</Text>
+                </View>
+
+                <View style={styles.modalDetailRow}>
+                  <Text style={styles.modalDetailLabel}>Description:</Text>
+                  <Text style={styles.modalDetailValue}>{activeModality.description}</Text>
+                </View>
+
+                <View style={styles.modalDetailRow}>
+                  <Text style={styles.modalDetailLabel}>Sign Target:</Text>
+                  <Text style={styles.modalDetailValue}>{activeModality.clinicalSign}</Text>
+                </View>
+
+                <View style={styles.modalDetailRow}>
+                  <Text style={styles.modalDetailLabel}>AI Saliency:</Text>
+                  <Text style={[styles.modalDetailValue, { color: '#059669', fontWeight: '700' }]}>
+                    {activeModality.findings}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Evidence Checklist in Modal */}
+              <View style={styles.modalDetailsCard}>
+                <Text style={styles.modalCardHeader}>DETECTED RETINAL EVIDENCE</Text>
+                {evidence.map((item, index) => {
+                  const isRed = item.color === 'red' || item.level === 'High';
+                  const isAmber = item.color === 'amber' || item.level === 'Moderate';
+                  const dotColor = isRed ? '#ef4444' : isAmber ? '#d97706' : '#10b981';
+
+                  return (
+                    <View key={index} style={styles.modalEvidenceItem}>
+                      <View style={[styles.evidenceDot, { backgroundColor: dotColor }]} />
+                      <Text style={styles.modalEvidenceName}>{item.name}</Text>
+                      <Text style={[styles.modalEvidenceLevel, { color: dotColor }]}>
+                        {item.level}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+
+              {/* Bottom Done Button */}
+              <TouchableOpacity
+                style={styles.modalBottomDoneBtn}
+                activeOpacity={0.85}
+                onPress={() => setShowViewerModal(false)}
+              >
+                <Text style={styles.modalBottomDoneBtnText}>Done Viewing</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
         </View>
       </Modal>
     </View>

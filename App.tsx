@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Platform } from 'react-native';
 import { AppProvider, useApp } from './src/context/AppContext';
 import { WelcomeScreen } from './src/screens/WelcomeScreen';
 import { SignInScreen } from './src/screens/SignInScreen';
@@ -75,19 +75,54 @@ function AppNavigator() {
 }
 
 export default function App() {
+  const isWeb = Platform.OS === 'web';
+
   return (
     <AppProvider>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <AppNavigator />
-          <StatusBar style="dark" />
+      <View style={styles.rootBackground}>
+        <View style={isWeb ? styles.webCenterContainer : styles.nativeContainer}>
+          <SafeAreaView style={styles.safeArea}>
+            <View style={styles.container}>
+              <AppNavigator />
+              <StatusBar style="dark" />
+            </View>
+          </SafeAreaView>
         </View>
-      </SafeAreaView>
+      </View>
     </AppProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  rootBackground: {
+    flex: 1,
+    height: '100%' as any,
+    minHeight: '100%' as any,
+    backgroundColor: Platform.OS === 'web' ? '#0f172a' : '#f8fafc',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  webCenterContainer: {
+    width: '100%',
+    maxWidth: 440,
+    height: '100%',
+    maxHeight: 900,
+    backgroundColor: '#f8fafc',
+    borderRadius: 28,
+    overflow: 'hidden',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 18 },
+    shadowOpacity: 0.25,
+    shadowRadius: 36,
+    elevation: 16,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  nativeContainer: {
+    flex: 1,
+    width: '100%',
+    height: '100%' as any,
+  },
   safeArea: {
     flex: 1,
     height: '100%' as any,
