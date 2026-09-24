@@ -1,0 +1,110 @@
+# Candidate architecture configuration. Values marked TODO/EXPERIMENT are not
+# final model or training decisions and must be selected through evaluation.
+
+[image_quality_assessment]
+role = "Assess gradability and quality dimensions before diagnostic interpretation."
+candidate_dimensions = ["clarity", "field_definition", "artifacts", "overall_gradability"]
+method = "TODO: select and validate"
+threshold_policy = "TODO: calibrate against annotated quality data"
+
+[preprocessing]
+role = "Apply deterministic retinal-field handling and baseline model-input preparation after input validation."
+baseline = "RGB conversion, conservative intensity-based retinal-field crop with fallback, antialiased resize to 384x384, tensor conversion, ImageNet normalization"
+retinal_field_crop = "Enabled baseline; conservative threshold/padding requires validation."
+illumination_normalization = "Optional deterministic bounded global exposure adjustment; disabled by default; requires ablation."
+clahe = "Extension point only; disabled. Requires ablation because it can alter lesion appearance and XAI evidence."
+quality_guided_policy = "EXPERIMENT: define only after quality-study ablation"
+future_quality_assessment_integration = "TODO: quality metadata and IQA-guided decisions are not part of the Dataset API yet."
+
+[retinal_encoder]
+role = "Produce a domain-robust retinal representation for downstream tasks."
+backbone = "TODO: choose after benchmark and resource evaluation"
+initialization = "TODO: compare appropriate pretrained representations"
+
+[lesion_branch]
+role = "Produce lesion-localized evidence for explainability and grading interaction."
+supervision = "TODO: determine availability and suitability of lesion annotations"
+lesion_taxonomy = "TODO: define only from supported labels"
+
+[anatomical_structure_branch]
+role = "Optionally model clinically justified retinal structures or landmarks."
+enabled = "EXPERIMENT: include only if labels and ablations justify it"
+targets = "TODO: select justified structures"
+
+[cross_task_interaction]
+role = "Condition grading features on lesion or structure evidence."
+mechanism = "EXPERIMENT: compare attention/fusion alternatives"
+ablation_required = true
+
+[dr_grading]
+classes = [0, 1, 2, 3, 4]
+task_type = "ordinal DR grading"
+ordinal_method = "TODO: select and validate"
+
+[referable_dr]
+definition = "grade >= 2"
+decision_threshold = "TODO: choose on held-out clinical validation data"
+primary_targets = ["sensitivity >90%", "specificity >85%"]
+
+[calibration]
+role = "Calibrate probabilities used in screening and referral reporting."
+method = "TODO: compare calibration methods"
+evaluation = "TODO: define calibration metrics and validation protocol"
+
+[uncertainty_conformal_prediction]
+role = "Report uncertainty and, if validated, an ordinal conformal prediction set."
+uncertainty_method = "EXPERIMENT: select and validate"
+conformal_method = "TODO: select ordinal-compatible method and coverage target"
+
+[explainability]
+role = "Provide Grad-CAM++ metadata and lesion-evidence explanation when available."
+grad_cam_variant = "Grad-CAM++ candidate"
+faithfulness_validation = "TODO: define lesion-grounding and clinical review protocol"
+
+[reliability_consistency_gate]
+role = "Combine quality, calibration, uncertainty, and evidence checks into a safety status."
+policy = "TODO: specify and validate decision rules"
+fallback = "TODO: define ungradable/insufficient-evidence handling"
+
+[domain_robustness]
+role = "Reduce sensitivity to acquisition-device and deployment-domain shifts."
+strategy = "EXPERIMENT: compare domain-generalization approaches"
+evaluation_domains = "TODO: define external and rural-deployment validation cohorts"
+
+[e0_training]
+model = "torchvision ResNet-50 with 5-output classifier"
+pretrained = true
+seed = 42
+image_size = 384
+epochs = 10
+batch_size = 8
+learning_rate = 0.0001
+weight_decay = 0.0001
+num_workers = 0
+imbalance_strategy = "inverse-frequency weighted cross-entropy using training partition only"
+
+[e0_development]
+model = "torchvision ResNet-50 with 5-output classifier"
+pretrained = true
+seed = 42
+image_size = 224
+epochs = 1
+batch_size = 8
+learning_rate = 0.0001
+weight_decay = 0.0001
+num_workers = 0
+imbalance_strategy = "inverse-frequency weighted cross-entropy using training partition only"
+
+[e3_development]
+model = "shared ResNet-50 + MHSA + partial-supervision MA/HE/EX/SE lesion branch"
+pretrained = true
+seed = 42
+image_size = 224
+epochs = 1
+batch_size = 8
+learning_rate = 0.0001
+weight_decay = 0.0001
+lesion_loss = "masked Dice + BCE-with-logits; valid IDRiD annotations only"
+lesion_loss_weight = 1.0
+grading_provenance = "APTOS locked train split"
+lesion_provenance = "IDRiD verified 81-image annotation subset only; TODO/VERIFY local layout and encoding"

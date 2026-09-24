@@ -1,0 +1,57 @@
+# Evaluation protocol: definitions and required reporting, not model implementation.
+
+[primary_task]
+name = "5-class DR grading"
+grades = [0, 1, 2, 3, 4]
+aptos_split_policy = "TODO: define after downloaded-data inspection, duplicate audit, and metadata review."
+idrid_grading_split = "Dataset-provided 413/103 train/test split; preserve as documented until its protocol role is explicitly decided."
+
+[referable_dr]
+provisional_definition = "grade >= 2"
+status = "Matches the current SIH project statement as a protocol assumption; verify against clinical literature and cross-dataset label semantics. Not claimed clinically universal."
+
+[metrics.dr_grading]
+required = ["accuracy", "macro_f1", "per_class_precision", "per_class_recall", "confusion_matrix", "quadratic_weighted_kappa"]
+
+[metrics.referable_dr]
+required = ["sensitivity", "specificity", "roc_auc", "pr_auc", "ppv", "npv", "f1"]
+cross_dataset_mapping = "TODO/VERIFY before deriving referable DR from external labels."
+
+[metrics.reliability]
+required = ["expected_calibration_error", "brier_score", "negative_log_likelihood"]
+
+[metrics.selective_prediction]
+required = ["coverage", "selective_risk", "aurc", "sensitivity_at_selected_coverage_levels", "specificity_at_selected_coverage_levels"]
+coverage_levels = "TODO/DEFINE"
+
+[metrics.robustness]
+required = ["internal_test_performance", "external_domain_shift_performance", "performance_by_image_quality_stratum", "performance_by_dataset_domain"]
+messidor_2_external_dr_performance = "TODO: official Messidor-2 release has no DR ground truth."
+
+[metrics.explanation]
+candidate_categories = ["lesion_localization_agreement", "explanation_fidelity", "explanation_stability"]
+clinical_review_protocol = "TODO"
+single_explainability_score = "Not defined"
+
+[metrics.quality]
+gradability_classification_metrics = "TODO: neither APTOS nor IDRiD is assumed to provide official binary gradable/ungradable labels."
+performance_by_quality_stratum = "Required only after a defensible quality definition and labels/strata are established."
+
+[statistical_reporting]
+confidence_intervals = "TODO/DEFINE"
+random_seed_policy = "Record every seed; use configured seeds for all split and run artifacts."
+repeated_runs_or_bootstrap_policy = "TODO"
+significance_testing = "TODO unless justified by a pre-specified comparison"
+
+[data_partitions]
+development_training = "Training-only data; never used for final internal or external test reporting."
+internal_validation = "Used for model selection and threshold/method development only."
+internal_test = "Held out until final internal evaluation; never used for tuning."
+external_domain_shift_test = "Kept separate from all development and internal test decisions; no Messidor-2 DR evaluation until valid labels are verified."
+
+[data_leakage_prevention]
+image_duplication = "Prevent identical or near-duplicate images from crossing partitions; audit method TODO/DEFINE."
+patient_leakage = "Group by patient whenever patient identity exists; APTOS patient identifiers are TODO/VERIFY."
+annotation_leakage = "Do not use annotations from validation/test images during training or method selection. IDRiD lesion labels are partial and must remain partition-isolated."
+test_set_tuning = "Do not tune architecture, thresholds, preprocessing, calibration, or gates on internal or external test sets."
+external_test_contamination = "Do not use external-test images, labels, or derived statistics for development."

@@ -1,0 +1,24 @@
+# Render Blueprint configuration for SIH-26038 FastAPI inference service
+services:
+  - type: web
+    name: sih26038-api
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_PATH
+        value: /app/checkpoints/e9_full_referable_best.pt
+      - key: INFERENCE_DEVICE
+        value: cpu
+      - key: OMP_NUM_THREADS
+        value: "2"
+      - key: MKL_NUM_THREADS
+        value: "2"
+      - key: OPENBLAS_NUM_THREADS
+        value: "2"
+      - key: TORCH_NUM_THREADS
+        value: "2"
+      - key: MALLOC_TRIM_THRESHOLD_
+        value: "0"
+      - key: PYTORCH_NO_CUDA_MEMORY_CACHING
+        value: "1"

@@ -1,0 +1,17 @@
+data/aptos/*
+!data/aptos/README.md
+data/idrid/*
+!data/idrid/README.md
+data/drive/*
+!data/drive/README.md
+data/messidor2/*
+!data/messidor2/README.md
+
+# Generated local inspection artifacts; manifests are generated only after data verification.
+data/**/manifest.*
+data/**/.cache/
+data/**/__pycache__/
+
+# Ignore heavy binary checkpoints to prevent GitHub 100MB file limit errors
+checkpoints/*.pt
+!checkpoints/README.md

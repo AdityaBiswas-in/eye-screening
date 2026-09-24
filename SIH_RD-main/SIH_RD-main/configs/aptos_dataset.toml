@@ -1,0 +1,10 @@
+[aptos]
+# Set this here or export APTOS_DATASET_ROOT. The environment variable takes precedence.
+# Example: dataset_root = "../data/raw/aptos-2019"
+dataset_root = ""
+labels_file = "train.csv"
+images_dir = "train_images"
+id_column = "id_code"
+label_column = "diagnosis"
+validation_fraction = 0.2
+seed = 42

@@ -1,0 +1,25 @@
+[project]
+name = "SIH-26038"
+problem_statement = "Explainable AI for Diabetic Retinopathy Screening in Rural India"
+deployment_target = "FastAPI + Docker"
+architecture = "single-api"
+primary_api_endpoint = "POST /predict"
+
+[clinical_task]
+supported_dr_grades = [0, 1, 2, 3, 4]
+referable_dr_definition = "grade >= 2"
+target_referable_dr_sensitivity = ">90%"
+target_referable_dr_specificity = ">85%"
+
+[reproducibility]
+split_seed = 42
+
+[paths]
+# These values are intentionally portable. Environment variables take precedence
+# when the future runtime configuration loader is implemented.
+dataset_root = ""
+dataset_root_env = "APTOS_DATASET_ROOT"
+model_root = "models"
+model_root_env = "SIH26038_MODEL_ROOT"
+artifact_root = "experiments"
+artifact_root_env = "SIH26038_ARTIFACT_ROOT"

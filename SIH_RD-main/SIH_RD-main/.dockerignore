@@ -1,0 +1,17 @@
+.git
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.ipynb_checkpoints
+data/
+logs/
+outputs/
+runs/
+wandb/
+.DS_Store
+
+# Include the locked production E9 checkpoint for self-contained image build.
+checkpoints/*
+!checkpoints/e9_full_referable_best.pt

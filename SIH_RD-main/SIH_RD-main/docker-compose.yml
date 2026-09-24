@@ -1,0 +1,10 @@
+services:
+  sih26038-api:
+    build: .
+    image: sih26038-api:local
+    ports:
+      - "8000:8000"
+    environment:
+      MODEL_PATH: /models/e9_full_referable_best.pt
+    volumes:
+      - ./checkpoints/e9_full_referable_best.pt:/models/e9_full_referable_best.pt:ro
