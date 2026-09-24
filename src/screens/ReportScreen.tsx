@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   Modal,
+  Platform,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
@@ -1779,6 +1780,28 @@ const styles = StyleSheet.create({
   },
 
   // --- Retinal Modal Styles ---
+  modalRootOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(2, 6, 23, 0.88)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalDeviceContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: Platform.OS === 'web' ? 440 : undefined,
+    maxHeight: Platform.OS === 'web' ? 900 : undefined,
+    backgroundColor: '#090d16',
+    borderRadius: Platform.OS === 'web' ? 28 : 0,
+    overflow: 'hidden',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 18 },
+    shadowOpacity: 0.35,
+    shadowRadius: 36,
+    elevation: 20,
+    borderWidth: Platform.OS === 'web' ? 1 : 0,
+    borderColor: '#1e293b',
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: '#090d16',
@@ -1787,9 +1810,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingTop: 52,
-    paddingBottom: 16,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'ios' ? 48 : Platform.OS === 'web' ? 18 : 24,
+    paddingBottom: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#1e293b',
     backgroundColor: '#0f172a',
@@ -1801,6 +1824,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#334155',
   },
   modalCloseBtnText: {
     color: '#e2e8f0',
@@ -1888,6 +1913,30 @@ const styles = StyleSheet.create({
   modalRetinaImage: {
     width: '100%',
     height: '100%',
+  },
+  modalFilterThermalTint: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(249, 115, 22, 0.18)',
+  },
+  modalFilterRedFreeTint: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(16, 185, 129, 0.20)',
+  },
+  modalFilterVesselsTint: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(56, 189, 248, 0.20)',
   },
   modalGradCamOverlay: {
     position: 'absolute',
