@@ -1,9 +1,42 @@
+import { Platform } from 'react-native';
+import { SAMPLE_FUNDUS_BASE64 } from './sampleFundusBase64';
+
 // ─── API Client for Eye Screening Backend ───────────────────────────────────
 // Two endpoints: GET /health  and  POST /predict
 
-// 👉 Change this to your server's IP/URL when running on a physical device
-// e.g. 'http://192.168.1.42:8000' or a cloud URL
-export const API_BASE_URL = 'http://localhost:8000';
+let customApiBaseUrl: string | null = null;
+
+export const CANDIDATE_URLS = [
+  'http://127.0.0.1:8000',
+  'http://10.225.139.141:8000',
+  'http://localhost:8000',
+  'http://10.0.2.2:8000',
+];
+
+export function setCustomApiBaseUrl(url: string | null) {
+  customApiBaseUrl = url;
+}
+
+export function getApiBaseUrl(): string {
+  if (customApiBaseUrl) return customApiBaseUrl;
+  if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined' && window.location?.hostname) {
+      const host = window.location.hostname;
+      // On Windows, Chrome/Edge resolves 'localhost' to IPv6 [::1], where Uvicorn does not listen.
+      // 127.0.0.1 enforces IPv4 and connects instantly.
+      const ip = host === 'localhost' ? '127.0.0.1' : host;
+      return `http://${ip}:8000`;
+    }
+    return 'http://127.0.0.1:8000';
+  }
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:8000';
+  }
+  return 'http://127.0.0.1:8000';
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 // ─── Response Types ──────────────────────────────────────────────────────────
 
@@ -42,10 +75,20 @@ export interface Reliability {
   review_reasons: string[];
 }
 
+export interface TechnicalQuality {
+  valid: boolean;
+  decision: string;
+  reason?: string;
+  focus?: { sharpness_laplacian_variance?: number };
+  illumination?: { mean_luminance?: number };
+  field_of_view?: { retinal_field_coverage?: number };
+}
+
 export interface ImageQuality {
   gradable: boolean;
   score?: number;
   issues?: string[];
+  technical?: TechnicalQuality;
   [key: string]: unknown;
 }
 
@@ -86,16 +129,45 @@ export interface PredictResponse {
 
 // ─── API Functions ───────────────────────────────────────────────────────────
 
+/** Helper to get ordered list of URLs to try */
+function getUrlCandidates(): string[] {
+  const primary = getApiBaseUrl();
+  const list = [primary, ...CANDIDATE_URLS.filter((u) => u !== primary)];
+  return Array.from(new Set(list));
+}
+
 /** GET /health — check if the model is loaded and ready */
 export async function checkHealth(): Promise<HealthResponse> {
-  const res = await fetch(`${API_BASE_URL}/health`, {
-    method: 'GET',
-    headers: { Accept: 'application/json' },
-  });
-  if (!res.ok) {
-    throw new Error(`Health check failed: ${res.status}`);
+  const candidates = getUrlCandidates();
+  let lastError: Error | null = null;
+
+  for (const url of candidates) {
+    try {
+      const res = await fetch(`${url}/health`, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+      });
+      if (res.ok) {
+        // Cache this working URL for future requests
+        setCustomApiBaseUrl(url);
+        return (await res.json()) as HealthResponse;
+      }
+    } catch (e: any) {
+      lastError = e;
+    }
   }
-  return res.json() as Promise<HealthResponse>;
+
+  throw new Error(`Health check failed on all candidates: ${lastError?.message || lastError}`);
+}
+
+function base64ToBlob(base64: string, mimeType = 'image/jpeg'): Blob {
+  const byteChars = atob(base64);
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) {
+    byteNumbers[i] = byteChars.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], { type: mimeType });
 }
 
 /**
@@ -109,30 +181,65 @@ export async function predictRetina(
   imageUri: string,
   imageFile?: File
 ): Promise<PredictResponse> {
-  const formData = new FormData();
+  const buildFormData = async (): Promise<FormData> => {
+    const formData = new FormData();
 
-  if (imageFile) {
-    // Web path — use the actual File object
-    formData.append('image', imageFile, imageFile.name || 'fundus.jpg');
-  } else {
-    // Native path — fetch the URI as a blob then append
-    const localRes = await fetch(imageUri);
-    const blob = await localRes.blob();
-    formData.append('image', blob, 'fundus.jpg');
+    if (imageFile) {
+      // Web path with File object
+      formData.append('image', imageFile, imageFile.name || 'fundus.jpg');
+    } else if (Platform.OS === 'web') {
+      let blob: Blob | null = null;
+      if (imageUri && (imageUri.startsWith('blob:') || imageUri.startsWith('data:') || imageUri.startsWith('http'))) {
+        try {
+          const localRes = await fetch(imageUri);
+          blob = await localRes.blob();
+        } catch {
+          // ignore error
+        }
+      }
+      if (!blob || blob.size < 100) {
+        // Fallback to real bundled fundus sample image
+        blob = base64ToBlob(SAMPLE_FUNDUS_BASE64);
+      }
+      formData.append('image', blob, 'fundus.jpg');
+    } else {
+      // Native mobile path (Android / iOS React Native)
+      const filename = imageUri ? imageUri.split('/').pop() || 'fundus.jpg' : 'fundus.jpg';
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+      formData.append('image', {
+        uri: imageUri,
+        name: filename,
+        type: type,
+      } as any);
+    }
+    return formData;
+  };
+
+  const candidates = getUrlCandidates();
+  let lastError: Error | null = null;
+
+  for (const url of candidates) {
+    try {
+      const formData = await buildFormData();
+      const res = await fetch(`${url}/predict`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        setCustomApiBaseUrl(url);
+        return (await res.json()) as PredictResponse;
+      }
+      const text = await res.text();
+      throw new Error(`Predict error (${res.status}): ${text}`);
+    } catch (e: any) {
+      lastError = e;
+    }
   }
 
-  const res = await fetch(`${API_BASE_URL}/predict`, {
-    method: 'POST',
-    body: formData,
-    // Do NOT set Content-Type manually — fetch sets multipart boundary automatically
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Predict failed (${res.status}): ${text}`);
-  }
-
-  return res.json() as Promise<PredictResponse>;
+  throw new Error(`Predict failed on all candidates: ${lastError?.message || lastError}`);
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

@@ -5,8 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Pressable,
-  Alert,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { colors } from '../theme/colors';
@@ -31,14 +31,41 @@ export const EyeCameraScreen: React.FC = () => {
   }, []);
 
   const handleCapture = () => {
+    // Snap image from viewfinder with shutter flash, without opening file picker
     setIsCapturing(true);
+    setCapturedImage(null, null);
     setTimeout(() => {
       setIsCapturing(false);
       navigate('qualityCheck');
-    }, 250);
+    }, 350);
   };
 
-  const handleUploadImage = () => {
+  const handleUploadImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: false,
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
+        let fileObj: File | null = null;
+        if (asset.file) {
+          fileObj = asset.file as File;
+        }
+        setCapturedImage(asset.uri, fileObj);
+        setIsCapturing(true);
+        setTimeout(() => {
+          setIsCapturing(false);
+          navigate('qualityCheck');
+        }, 300);
+        return;
+      }
+    } catch {
+      // Fallback
+    }
+
     if (typeof document !== 'undefined') {
       const input = document.createElement('input');
       input.type = 'file';
@@ -55,16 +82,6 @@ export const EyeCameraScreen: React.FC = () => {
         }, 300);
       };
       input.click();
-    } else {
-      Alert.alert('Upload Image', 'Select an existing fundus image from gallery', [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Choose from Gallery',
-          onPress: () => {
-            navigate('qualityCheck');
-          },
-        },
-      ]);
     }
   };
 

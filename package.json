@@ -6,8 +6,10 @@
     "@expo/metro-runtime": "~57.0.16",
     "@expo/vector-icons": "^15.0.2",
     "expo": "~57.0.24",
+    "expo-asset": "~57.0.18",
     "expo-clipboard": "~57.0.2",
     "expo-font": "~57.0.4",
+    "expo-image-picker": "~57.0.19",
     "expo-secure-store": "~57.0.4",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
@@ -26,7 +28,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "backend": "cd SIH_RD-main/SIH_RD-main && .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
   },
   "private": true
 }

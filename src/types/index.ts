@@ -78,10 +78,21 @@ export interface ScreeningRecord {
   // Real API fields from POST /predict
   gradCamBase64?: string;           // explainability.overlay_png_base64
   uncertaintyLevel?: string;        // uncertainty.level
+  conformalPredictionSet?: string[]; // uncertainty.conformal_prediction_set
   referableDR?: boolean;            // referable_dr.prediction
   referableProbability?: number;    // referable_dr.probability
   reviewRequired?: boolean;         // reliability.review_required
   reviewReasons?: string[];         // reliability.review_reasons
+  classProbabilities?: { [label: string]: number };
+  lesionScores?: { [lesion: string]: number };
+  technicalQuality?: {
+    valid: boolean;
+    decision: string;
+    reason?: string;
+    sharpness?: number;
+    meanLuminance?: number;
+    fieldCoverage?: number;
+  };
 }
 
 export interface DoctorProfile {

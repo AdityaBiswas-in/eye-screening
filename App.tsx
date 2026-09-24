@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, SafeAreaView, Platform } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Platform, Text, TouchableOpacity } from 'react-native';
 import { AppProvider, useApp } from './src/context/AppContext';
 import { WelcomeScreen } from './src/screens/WelcomeScreen';
 import { SignInScreen } from './src/screens/SignInScreen';
@@ -20,6 +20,48 @@ import { EyeCameraScreen } from './src/screens/EyeCameraScreen';
 import { QualityCheckScreen } from './src/screens/QualityCheckScreen';
 import { ScreeningHistoryScreen } from './src/screens/ScreeningHistoryScreen';
 import { ReportScreen } from './src/screens/ReportScreen';
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ScreenErrorBoundary extends React.Component<{ children: React.ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('[ScreenErrorBoundary]', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={{ flex: 1, padding: 24, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' }}>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: '#dc2626', marginBottom: 8 }}>
+            Display Error
+          </Text>
+          <Text style={{ fontSize: 13, color: '#64748b', textAlign: 'center', marginBottom: 16 }}>
+            {this.state.error?.message || 'An unexpected rendering error occurred.'}
+          </Text>
+          <TouchableOpacity
+            style={{ backgroundColor: '#0284c7', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10 }}
+            onPress={() => this.setState({ hasError: false, error: null })}
+          >
+            <Text style={{ color: '#ffffff', fontWeight: '700' }}>Retry Screen</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function AppNavigator() {
   const { currentScreen } = useApp();
@@ -69,7 +111,9 @@ function AppNavigator() {
 
   return (
     <View style={styles.screenWrapper}>
-      {renderScreen()}
+      <ScreenErrorBoundary key={currentScreen}>
+        {renderScreen()}
+      </ScreenErrorBoundary>
     </View>
   );
 }
